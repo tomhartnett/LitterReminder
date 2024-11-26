@@ -10,6 +10,7 @@ import SwiftUI
 
 struct ContentView: View {
     @State private var viewModel: ViewModel
+    @State private var showConfirmMarkComplete = false
 
     var body: some View {
         VStack {
@@ -27,13 +28,19 @@ struct ContentView: View {
                 .buttonStyle(PrimaryButtonStyle())
             } else {
                 Button(action: {
-                    viewModel.markComplete()
-                    viewModel.addCleaning()
+                    showConfirmMarkComplete.toggle()
                 }) {
                     Text("Mark Complete")
                 }
                 .buttonStyle(PrimaryButtonStyle())
             }
+        }
+        .confirmationDialog("Confirm", isPresented: $showConfirmMarkComplete) {
+            Button("Mark Complete", role: .destructive) {
+                viewModel.markComplete()
+                viewModel.addCleaning()
+            }
+            Button("Cancel", role: .cancel) { }
         }
     }
 

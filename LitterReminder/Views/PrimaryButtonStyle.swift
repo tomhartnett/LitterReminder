@@ -15,7 +15,8 @@ struct PrimaryButtonStyle: PrimitiveButtonStyle {
             configuration.label
                 .font(.title3)
                 .fontWeight(.bold)
-                .padding()
+                .padding(.vertical)
+                .padding(.horizontal, 32)
                 .background(Color.blue)
                 .foregroundColor(.white)
                 .cornerRadius(8)
