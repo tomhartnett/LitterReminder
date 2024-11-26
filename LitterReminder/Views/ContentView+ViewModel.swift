@@ -29,6 +29,14 @@ extension ContentView {
             fetchData()
         }
 
+        func delete(atOffsets: IndexSet) {
+            let cleaningsToDelete = atOffsets.compactMap({ cleanings[safe: $0] })
+            for cleaning in cleaningsToDelete {
+                modelContext.delete(cleaning)
+            }
+            fetchData()
+        }
+
         func fetchData() {
             do {
                 let descriptor = FetchDescriptor<Cleaning>(

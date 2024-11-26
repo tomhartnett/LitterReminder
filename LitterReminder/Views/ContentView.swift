@@ -14,8 +14,13 @@ struct ContentView: View {
 
     var body: some View {
         VStack {
-            List(viewModel.cleanings) { cleaning in
-                CleaningView(cleaning: cleaning)
+            List {
+                ForEach(viewModel.cleanings) { cleaning in
+                    CleaningView(cleaning: cleaning)
+                }
+                .onDelete { indexSet in
+                    viewModel.delete(atOffsets: indexSet)
+                }
             }
             .listStyle(.plain)
 
@@ -38,7 +43,9 @@ struct ContentView: View {
         .confirmationDialog("Confirm", isPresented: $showConfirmMarkComplete) {
             Button("Mark Complete", role: .destructive) {
                 viewModel.markComplete()
-                viewModel.addCleaning()
+                withAnimation {
+                    viewModel.addCleaning()
+                }
             }
             Button("Cancel", role: .cancel) { }
         }
