@@ -23,7 +23,7 @@ struct AppFormatterTests {
         let currentDate = scheduledDate.addingTimeInterval(-3600 * 48)
 
         // When
-        let string = AppDateFormatter.dateDisplayText(for: scheduledDate, relativeTo: currentDate)
+        let string = AppDateFormatter.scheduledDateDisplayText(for: scheduledDate, relativeTo: currentDate)
 
         // Then
         #expect(string == "Monday, 5:00 PM")
@@ -34,7 +34,7 @@ struct AppFormatterTests {
         let currentDate = scheduledDate.addingTimeInterval(-3600 * 8)
 
         // When
-        let string = AppDateFormatter.dateDisplayText(for: scheduledDate, relativeTo: currentDate)
+        let string = AppDateFormatter.scheduledDateDisplayText(for: scheduledDate, relativeTo: currentDate)
 
         // Then
         #expect(string == "Monday, 5:00 PM")
@@ -45,7 +45,7 @@ struct AppFormatterTests {
         let currentDate = scheduledDate!
 
         // When
-        let string = AppDateFormatter.dateDisplayText(for: scheduledDate, relativeTo: currentDate)
+        let string = AppDateFormatter.scheduledDateDisplayText(for: scheduledDate, relativeTo: currentDate)
 
         // Then
         #expect(string == "now")
@@ -56,7 +56,7 @@ struct AppFormatterTests {
         let currentDate = scheduledDate.addingTimeInterval(300)
 
         // When
-        let string = AppDateFormatter.dateDisplayText(for: scheduledDate, relativeTo: currentDate)
+        let string = AppDateFormatter.scheduledDateDisplayText(for: scheduledDate, relativeTo: currentDate)
 
         // Then
         #expect(string == "5 minutes ago")
@@ -67,7 +67,7 @@ struct AppFormatterTests {
         let currentDate = scheduledDate.addingTimeInterval(3600)
 
         // When
-        let string = AppDateFormatter.dateDisplayText(for: scheduledDate, relativeTo: currentDate)
+        let string = AppDateFormatter.scheduledDateDisplayText(for: scheduledDate, relativeTo: currentDate)
 
         // Then
         #expect(string == "1 hour ago")
@@ -78,7 +78,7 @@ struct AppFormatterTests {
         let currentDate = scheduledDate.addingTimeInterval(3600 * 16)
 
         // When
-        let string = AppDateFormatter.dateDisplayText(for: scheduledDate, relativeTo: currentDate)
+        let string = AppDateFormatter.scheduledDateDisplayText(for: scheduledDate, relativeTo: currentDate)
 
         // Then
         #expect(string == "16 hours ago")

@@ -11,11 +11,15 @@ import SwiftUI
 extension ContentView {
     @Observable
     class ViewModel {
-        var modelContext: ModelContext
+        var currentDate: Date
+
         var cleanings = [Cleaning]()
 
-        init(modelContext: ModelContext) {
+        private var modelContext: ModelContext
+
+        init(modelContext: ModelContext, currentDate: Date = .now) {
             self.modelContext = modelContext
+            self.currentDate = currentDate
             fetchData()
         }
 
@@ -58,6 +62,10 @@ extension ContentView {
             mostRecent.completedDate = currentDate
             saveChanges()
             fetchData()
+        }
+
+        func updateCurrentDate() {
+            currentDate = .now
         }
 
         private func saveChanges() {

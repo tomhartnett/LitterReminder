@@ -8,9 +8,9 @@
 import Foundation
 
 class AppDateFormatter {
-    private static let dateFormatter: DateFormatter = {
+    private static let completedDateFormatter: DateFormatter = {
         let formatter = DateFormatter()
-        formatter.dateFormat = "EEEE, h:mm a"
+        formatter.dateFormat = "MM/dd/yyyy h:mm a"
         return formatter
     }()
 
@@ -20,7 +20,17 @@ class AppDateFormatter {
         return formatter
     }()
 
-    static func dateDisplayText(
+    private static let scheduledDateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "EEEE, h:mm a"
+        return formatter
+    }()
+
+    static func completedDateDisplayText(_ completedDate: Date) -> String {
+        completedDateFormatter.string(from: completedDate)
+    }
+
+    static func scheduledDateDisplayText(
         for date: Date,
         relativeTo currentDate: Date = Date()
     ) -> String {
@@ -29,7 +39,7 @@ class AppDateFormatter {
 
         if interval > 0 && interval < 518_400 {
             // Within next 6 days
-            return dateFormatter.string(from: date)
+            return scheduledDateFormatter.string(from: date)
         } else {
             return relativeDateFormatter.localizedString(for: date, relativeTo: currentDate)
         }

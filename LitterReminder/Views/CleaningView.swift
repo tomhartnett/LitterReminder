@@ -12,85 +12,94 @@ enum CleaningStatus {
     case due
     case completed
     case overdue
-
-    var imageSystemName: String {
-        switch self {
-        case .scheduled:
-            return "clock"
-        case .due:
-            return "clock.badge"
-        case .completed:
-            return "clock.badge.checkmark"
-        case .overdue:
-            return "clock.badge.exclamationmark"
-        }
-    }
-
-    var title: String {
-        switch self {
-        case .scheduled:
-            return "Cleaning scheduled"
-        case .due:
-            return "Cleaning is due"
-        case .completed:
-            return "Cleaning completed"
-        case .overdue:
-            return "Cleaning is overdue!"
-        }
-    }
-
-    var badgeColor: Color {
-        switch self {
-        case .scheduled:
-            return .primary
-        case .due:
-            return .red
-        case .completed:
-            return .green
-        case .overdue:
-            return .orange
-        }
-    }
 }
 
 struct CleaningView: View {
-    var cleaning: Cleaning
+    var model: Model
 
     var body: some View {
         HStack(spacing: 24) {
-            Image(systemName: cleaning.status().imageSystemName)
-                .imageScale(.large)
-                .font(.title)
-                .symbolRenderingMode(.palette)
-                .foregroundStyle(cleaning.status().badgeColor, .primary)
+            Image(systemName: model.imageSystemName)
+                .font(.largeTitle)
+                .foregroundStyle(Color(uiColor: model.badgeColor), .primary)
 
             VStack(alignment: .leading) {
-                Text(cleaning.status().title)
+                Text(model.title)
                     .font(.title)
 
-                if let completedDate = cleaning.completedDate {
-                    Text(completedDate, format: .dateTime)
-                } else {
-                    Text(AppDateFormatter.dateDisplayText(for: cleaning.scheduledDate))
-                }
+                Text(model.subtitle)
+                    .foregroundStyle(.secondary)
             }
         }
-
         .padding()
     }
 }
 
+extension CleaningView {
+    struct Model {
+        let imageSystemName: String
+        let badgeColor: UIColor
+        let title: String
+        let subtitle: String
+
+        init(
+            imageSystemName: String,
+            badgeColor: UIColor,
+            title: String,
+            subtitle: String
+        ) {
+            self.imageSystemName = imageSystemName
+            self.badgeColor = badgeColor
+            self.title = title
+            self.subtitle = subtitle
+        }
+
+        init(
+            currentDate: Date,
+            scheduledDate: Date,
+            completedDate: Date?
+        ) {
+            if let completedDate {
+                self.init(
+                    imageSystemName: "clock.badge.checkmark",
+                    badgeColor: .systemGreen,
+                    title: "Cleaning completed",
+                    subtitle: AppDateFormatter.completedDateDisplayText(completedDate)
+                )
+            } else if currentDate < scheduledDate {
+                self.init(
+                    imageSystemName: "clock",
+                    badgeColor: .label,
+                    title: "Cleaning scheduled",
+                    subtitle: AppDateFormatter.scheduledDateDisplayText(for: scheduledDate)
+                )
+            } else {
+                let elapsedTime = currentDate.timeIntervalSince(scheduledDate)
+                if elapsedTime <= 3600 {
+                    self.init(
+                        imageSystemName: "clock.badge",
+                        badgeColor: .systemRed,
+                        title: "Cleaning is due",
+                        subtitle: AppDateFormatter.scheduledDateDisplayText(for: scheduledDate)
+                    )
+                } else {
+                    self.init(
+                        imageSystemName: "clock.badge.exclamationmark",
+                        badgeColor: .systemOrange,
+                        title: "Cleaning is overdue",
+                        subtitle: AppDateFormatter.scheduledDateDisplayText(for: scheduledDate)
+                    )
+                }
+            }
+        }
+    }
+}
+
 #Preview {
-    VStack(alignment: .leading) {
-        CleaningView(cleaning: Cleaning(createdDate: .now, scheduledDate: .now.addingTimeInterval(3600 * 48)))
-        CleaningView(cleaning: Cleaning(createdDate: .now, scheduledDate: .now.addingTimeInterval(-1800)))
-        CleaningView(cleaning: Cleaning(createdDate: .now, scheduledDate: .now.addingTimeInterval(-3601)))
-        CleaningView(
-            cleaning: Cleaning(
-                createdDate: .now,
-                scheduledDate: .now.addingTimeInterval(-3601),
-                completedDate: .now
-            )
-        )
+    List {
+        CleaningView(model: .scheduledModel)
+        CleaningView(model: .dueModel)
+        CleaningView(model: .overdueModel)
+        CleaningView(model: .completedModel)
     }
 }

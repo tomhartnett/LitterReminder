@@ -9,6 +9,7 @@ import SwiftData
 import SwiftUI
 
 struct ContentView: View {
+    @Environment(\.scenePhase) private var scenePhase
     @State private var viewModel: ViewModel
     @State private var showConfirmMarkComplete = false
 
@@ -16,7 +17,13 @@ struct ContentView: View {
         VStack {
             List {
                 ForEach(viewModel.cleanings) { cleaning in
-                    CleaningView(cleaning: cleaning)
+                    CleaningView(
+                        model: .init(
+                            currentDate: viewModel.currentDate,
+                            scheduledDate: cleaning.scheduledDate,
+                            completedDate: cleaning.completedDate
+                        )
+                    )
                 }
                 .onDelete { indexSet in
                     viewModel.delete(atOffsets: indexSet)
@@ -48,6 +55,12 @@ struct ContentView: View {
                 }
             }
             Button("Cancel", role: .cancel) { }
+        }
+        .onChange(of: scenePhase) { _, newValue in
+            if newValue == .active {
+                viewModel.fetchData()
+                viewModel.updateCurrentDate()
+            }
         }
     }
 
