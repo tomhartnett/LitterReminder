@@ -45,16 +45,16 @@ struct ContentView: View {
                     Text("Mark Complete")
                 }
                 .buttonStyle(PrimaryButtonStyle())
-            }
-        }
-        .confirmationDialog("Confirm", isPresented: $showConfirmMarkComplete) {
-            Button("Mark Complete", role: .destructive) {
-                viewModel.markComplete()
-                withAnimation {
-                    viewModel.addCleaning()
+                .confirmationDialog("Confirm", isPresented: $showConfirmMarkComplete) {
+                    Button("Mark Complete", role: .destructive) {
+                        viewModel.markComplete()
+                        withAnimation {
+                            viewModel.addCleaning()
+                        }
+                    }
+                    Button("Cancel", role: .cancel) { }
                 }
             }
-            Button("Cancel", role: .cancel) { }
         }
         .onChange(of: scenePhase) { _, newValue in
             if newValue == .active {
