@@ -60,6 +60,7 @@ struct ContentView: View {
             if newValue == .active {
                 viewModel.fetchData()
                 viewModel.updateCurrentDate()
+                viewModel.requestRemindersAccess()
             }
         }
     }
