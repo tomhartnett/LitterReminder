@@ -14,6 +14,10 @@ class Cleaning {
     var scheduledDate: Date
     var completedDate: Date?
 
+    var isComplete: Bool {
+        completedDate != nil
+    }
+
     init(createdDate: Date, scheduledDate: Date, completedDate: Date? = nil) {
         self.createdDate = createdDate
         self.scheduledDate = scheduledDate

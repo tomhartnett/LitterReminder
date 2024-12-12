@@ -60,6 +60,8 @@ extension ContentView {
                 minute: dueDateComps.minute
             )
 
+            reminder.addAlarm(EKAlarm(absoluteDate: date))
+
             do {
                 try eventStore.save(reminder, commit: true)
             } catch {
@@ -74,6 +76,7 @@ extension ContentView {
             for cleaning in cleaningsToDelete {
                 modelContext.delete(cleaning)
             }
+            saveChanges()
             fetchData()
         }
 
@@ -106,7 +109,7 @@ extension ContentView {
             switch status {
             case .notDetermined:
                 eventStore.requestFullAccessToReminders { granted, errorOrNil in
-                    if let errorOrNil {
+                    if errorOrNil != nil {
                         // Message error
                     }
 

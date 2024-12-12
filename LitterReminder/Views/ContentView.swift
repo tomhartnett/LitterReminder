@@ -31,9 +31,11 @@ struct ContentView: View {
             }
             .listStyle(.plain)
 
-            if viewModel.cleanings.isEmpty {
+            if viewModel.cleanings.first(where: { !$0.isComplete }) == nil {
                 Button(action: {
-                    viewModel.addCleaning()
+                    withAnimation {
+                        viewModel.addCleaning()
+                    }
                 }) {
                     Text("Schedule Cleaning")
                 }
