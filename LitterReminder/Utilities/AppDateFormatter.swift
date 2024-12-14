@@ -22,7 +22,15 @@ class AppDateFormatter {
 
     private static let scheduledDateFormatter: DateFormatter = {
         let formatter = DateFormatter()
-        formatter.dateFormat = "EEEE, h:mm a"
+        formatter.dateFormat = "EEEE 'at' h:mm a"
+        return formatter
+    }()
+
+    private static let todayTomorrowDateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.timeStyle = .medium
+        formatter.dateStyle = .medium
+        formatter.doesRelativeDateFormatting = true
         return formatter
     }()
 
@@ -35,9 +43,14 @@ class AppDateFormatter {
         relativeTo currentDate: Date = Date()
     ) -> String {
 
+        let calendar = Calendar.current
+        let isToday = calendar.isDateInToday(date)
+        let isTomorrow = calendar.isDateInTomorrow(date)
         let interval = date.timeIntervalSince(currentDate)
 
-        if interval > 0 && interval < 518_400 {
+        if isToday || isTomorrow {
+            return todayTomorrowDateFormatter.string(from: date)
+        } else if interval > 0 && interval < 518_400 {
             // Within next 6 days
             return scheduledDateFormatter.string(from: date)
         } else {

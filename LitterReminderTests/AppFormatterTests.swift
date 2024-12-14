@@ -26,7 +26,7 @@ struct AppFormatterTests {
         let string = AppDateFormatter.scheduledDateDisplayText(for: scheduledDate, relativeTo: currentDate)
 
         // Then
-        #expect(string == "Monday, 5:00 PM")
+        #expect(string == "Monday at 5:00 PM")
     }
 
     @Test func due_in_eight_hours() {
@@ -37,7 +37,7 @@ struct AppFormatterTests {
         let string = AppDateFormatter.scheduledDateDisplayText(for: scheduledDate, relativeTo: currentDate)
 
         // Then
-        #expect(string == "Monday, 5:00 PM")
+        #expect(string == "Monday at 5:00 PM")
     }
 
     @Test func due_now() {
@@ -82,5 +82,33 @@ struct AppFormatterTests {
 
         // Then
         #expect(string == "16 hours ago")
+    }
+
+    @Test func due_today() {
+        // Given
+        let currentDate = Date.now
+
+        // When
+        let string = AppDateFormatter.scheduledDateDisplayText(
+            for: currentDate.addingTimeInterval(3600),
+            relativeTo: currentDate
+        )
+
+        // Then
+        #expect(string.starts(with: "Today at "))
+    }
+
+    @Test func due_tomorrow() {
+        // Given
+        let currentDate = Date.now
+
+        // When
+        let string = AppDateFormatter.scheduledDateDisplayText(
+            for: currentDate.addingTimeInterval(24 * 3600),
+            relativeTo: currentDate
+        )
+
+        // Then
+        #expect(string.starts(with: "Tomorrow at "))
     }
 }

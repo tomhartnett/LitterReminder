@@ -16,6 +16,10 @@ extension ContentView {
 
         var cleanings = [Cleaning]()
 
+        var hasScheduledCleaning: Bool {
+            cleanings.first(where: { !$0.isComplete }) != nil
+        }
+
         private var modelContext: ModelContext
 
         private var eventStore: EKEventStore
@@ -71,23 +75,20 @@ extension ContentView {
             // TODO: return unique id of reminder
         }
 
-        func delete(atOffsets: IndexSet) {
-            let cleaningsToDelete = atOffsets.compactMap({ cleanings[safe: $0] })
-            for cleaning in cleaningsToDelete {
-                modelContext.delete(cleaning)
-            }
+        func delete(_ cleaning: Cleaning) {
+            modelContext.delete(cleaning)
             saveChanges()
             fetchData()
         }
 
         func fetchData() {
-            // TODO: add predicate to fetch only so far back
             do {
-                let descriptor = FetchDescriptor<Cleaning>(
+                var descriptor = FetchDescriptor<Cleaning>(
                     sortBy: [
                         SortDescriptor(\.createdDate, order: .reverse)
                     ]
                 )
+                descriptor.fetchLimit = 20
                 cleanings = try modelContext.fetch(descriptor)
             } catch {
                 print("Fetch failed")

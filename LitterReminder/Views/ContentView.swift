@@ -24,14 +24,18 @@ struct ContentView: View {
                             completedDate: cleaning.completedDate
                         )
                     )
-                }
-                .onDelete { indexSet in
-                    viewModel.delete(atOffsets: indexSet)
+                    .swipeActions(edge: .trailing) {
+                        Button(role: .destructive) {
+                            viewModel.delete(cleaning)
+                        } label: {
+                            Label("Delete", systemImage: "trash")
+                        }
+                    }
                 }
             }
             .listStyle(.plain)
 
-            if viewModel.cleanings.first(where: { !$0.isComplete }) == nil {
+            if !viewModel.hasScheduledCleaning {
                 Button(action: {
                     withAnimation {
                         viewModel.addCleaning()
