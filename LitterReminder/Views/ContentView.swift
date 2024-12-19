@@ -14,7 +14,7 @@ struct ContentView: View {
     @State private var showConfirmMarkComplete = false
 
     var body: some View {
-        VStack {
+        VStack(spacing: 0) {
             List {
                 ForEach(viewModel.cleanings) { cleaning in
                     CleaningView(
@@ -35,32 +35,12 @@ struct ContentView: View {
             }
             .listStyle(.plain)
 
-            if !viewModel.hasScheduledCleaning {
-                Button(action: {
-                    withAnimation {
-                        viewModel.addCleaning()
-                    }
-                }) {
-                    Text("Schedule Cleaning")
-                }
-                .buttonStyle(PrimaryButtonStyle())
-            } else {
-                Button(action: {
-                    showConfirmMarkComplete.toggle()
-                }) {
-                    Text("Mark Complete")
-                }
-                .buttonStyle(PrimaryButtonStyle())
-                .confirmationDialog("Confirm", isPresented: $showConfirmMarkComplete) {
-                    Button("Mark Complete", role: .destructive) {
-                        viewModel.markComplete()
-                        withAnimation {
-                            viewModel.addCleaning()
-                        }
-                    }
-                    Button("Cancel", role: .cancel) { }
-                }
+            VStack(spacing: 16) {
+                Divider()
+
+                actionButton
             }
+            .frame(maxWidth: .infinity)
         }
         .onChange(of: scenePhase) { _, newValue in
             if newValue == .active {
@@ -74,6 +54,36 @@ struct ContentView: View {
     init(modelContext: ModelContext) {
         let viewModel = ViewModel(modelContext: modelContext)
         _viewModel = State(initialValue: viewModel)
+    }
+
+    @ViewBuilder
+    private var actionButton: some View {
+        if !viewModel.hasScheduledCleaning {
+            Button(action: {
+                withAnimation {
+                    viewModel.addCleaning()
+                }
+            }) {
+                Text("Schedule Cleaning")
+            }
+            .buttonStyle(PrimaryButtonStyle())
+        } else {
+            Button(action: {
+                showConfirmMarkComplete.toggle()
+            }) {
+                Text("Mark Complete")
+            }
+            .buttonStyle(PrimaryButtonStyle())
+            .confirmationDialog("Confirm", isPresented: $showConfirmMarkComplete) {
+                Button("Mark Complete", role: .destructive) {
+                    viewModel.markComplete()
+                    withAnimation {
+                        viewModel.addCleaning()
+                    }
+                }
+                Button("Cancel", role: .cancel) { }
+            }
+        }
     }
 }
 
