@@ -10,6 +10,8 @@ These settings are not yet configurable.
 - Uses SwiftData to persist data
 - Creates a reminder using EventKit
 
-![App screenshot1](screenshot1.png)
+<img src= "screenshot1.png" alt="App screenshot 1" style="border: 1px solid grey;">
 
-![App screenshot2](screenshot2.png)
+Above: screenshot with data from real use. Below: SwiftUI preview showing various states.
+
+<img src= "screenshot2.png" alt="App screenshot 2" style="border: 1px solid grey;">
