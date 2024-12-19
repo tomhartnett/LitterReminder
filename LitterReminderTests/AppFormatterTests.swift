@@ -111,4 +111,39 @@ struct AppFormatterTests {
         // Then
         #expect(string.starts(with: "Tomorrow at "))
     }
+
+    @Test func completed_today() {
+        // Given
+        let currentDate = Date.now
+
+        // When
+        let string = AppDateFormatter.completedDateDisplayText(currentDate.addingTimeInterval(-8 * 3600))
+
+        // Then
+        #expect(string.starts(with: "Today at "))
+    }
+
+    @Test func completed_yesterday() {
+        // Given
+        let currentDate = Date.now
+
+        // When
+        let string = AppDateFormatter.completedDateDisplayText(currentDate.addingTimeInterval(-24 * 3600))
+
+        // Then
+        #expect(string.starts(with: "Yesterday at "))
+    }
+
+    @Test func completed_two_days_ago() {
+        // Given
+        let currentDate = Date.now
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MM/dd/yyyy h:mm a"
+
+        // When
+        let string = AppDateFormatter.completedDateDisplayText(currentDate.addingTimeInterval(-48 * 3600))
+
+        // Then
+        #expect(formatter.date(from: string) != nil)
+    }
 }

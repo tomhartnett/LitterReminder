@@ -24,22 +24,3 @@ class Cleaning {
         self.completedDate = completedDate
     }
 }
-
-extension Cleaning {
-    func status(_ currentDate: Date = .now) -> CleaningStatus {
-        if completedDate != nil {
-            return .completed
-        } else {
-            if currentDate < scheduledDate {
-                return .scheduled
-            } else {
-                let timeSinceDue = currentDate.timeIntervalSince(scheduledDate)
-                if timeSinceDue < 3600 {
-                    return .due
-                } else {
-                    return .overdue
-                }
-            }
-        }
-    }
-}

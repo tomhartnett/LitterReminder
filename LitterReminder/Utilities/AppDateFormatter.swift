@@ -35,7 +35,15 @@ class AppDateFormatter {
     }()
 
     static func completedDateDisplayText(_ completedDate: Date) -> String {
-        completedDateFormatter.string(from: completedDate)
+        let calendar = Calendar.current
+        let isToday = calendar.isDateInToday(completedDate)
+        let isYesterday = calendar.isDateInYesterday(completedDate)
+
+        if isToday || isYesterday {
+            return todayTomorrowDateFormatter.string(from: completedDate)
+        } else {
+            return completedDateFormatter.string(from: completedDate)
+        }
     }
 
     static func scheduledDateDisplayText(
@@ -46,15 +54,15 @@ class AppDateFormatter {
         let calendar = Calendar.current
         let isToday = calendar.isDateInToday(date)
         let isTomorrow = calendar.isDateInTomorrow(date)
-        let interval = date.timeIntervalSince(currentDate)
 
-        if isToday || isTomorrow {
-            return todayTomorrowDateFormatter.string(from: date)
-        } else if interval > 0 && interval < 518_400 {
-            // Within next 6 days
-            return scheduledDateFormatter.string(from: date)
-        } else {
+        if date <= currentDate {
             return relativeDateFormatter.localizedString(for: date, relativeTo: currentDate)
+        } else {
+            if isToday || isTomorrow {
+                return todayTomorrowDateFormatter.string(from: date)
+            } else {
+                return scheduledDateFormatter.string(from: date)
+            }
         }
     }
 }

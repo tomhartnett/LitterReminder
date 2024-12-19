@@ -21,11 +21,12 @@ struct CleaningView: View {
         HStack(spacing: 24) {
             Image(systemName: model.imageSystemName)
                 .font(.largeTitle)
-                .foregroundStyle(Color(uiColor: model.badgeColor), .primary)
+                .foregroundStyle(Color(uiColor: model.badgeColor), model.isCompleted ? .secondary : .primary)
 
             VStack(alignment: .leading) {
                 Text(model.title)
-                    .font(.title)
+                    .font(model.isCompleted ? .title2 : .title)
+                    .foregroundStyle(model.isCompleted ? .secondary : .primary)
 
                 Text(model.subtitle)
                     .foregroundStyle(.secondary)
@@ -41,17 +42,20 @@ extension CleaningView {
         let badgeColor: UIColor
         let title: String
         let subtitle: String
+        let isCompleted: Bool
 
         init(
             imageSystemName: String,
             badgeColor: UIColor,
             title: String,
-            subtitle: String
+            subtitle: String,
+            isCompleted: Bool
         ) {
             self.imageSystemName = imageSystemName
             self.badgeColor = badgeColor
             self.title = title
             self.subtitle = subtitle
+            self.isCompleted = isCompleted
         }
 
         init(
@@ -63,15 +67,17 @@ extension CleaningView {
                 self.init(
                     imageSystemName: "clock.badge.checkmark",
                     badgeColor: .systemGreen,
-                    title: "Cleaning completed",
-                    subtitle: AppDateFormatter.completedDateDisplayText(completedDate)
+                    title: "Completed",
+                    subtitle: AppDateFormatter.completedDateDisplayText(completedDate),
+                    isCompleted: true
                 )
             } else if currentDate < scheduledDate {
                 self.init(
                     imageSystemName: "clock",
                     badgeColor: .label,
                     title: "Cleaning scheduled",
-                    subtitle: AppDateFormatter.scheduledDateDisplayText(for: scheduledDate)
+                    subtitle: AppDateFormatter.scheduledDateDisplayText(for: scheduledDate),
+                    isCompleted: false
                 )
             } else {
                 let elapsedTime = currentDate.timeIntervalSince(scheduledDate)
@@ -80,14 +86,16 @@ extension CleaningView {
                         imageSystemName: "clock.badge",
                         badgeColor: .systemRed,
                         title: "Cleaning is due",
-                        subtitle: AppDateFormatter.scheduledDateDisplayText(for: scheduledDate)
+                        subtitle: AppDateFormatter.scheduledDateDisplayText(for: scheduledDate),
+                        isCompleted: false
                     )
                 } else {
                     self.init(
                         imageSystemName: "clock.badge.exclamationmark",
                         badgeColor: .systemOrange,
                         title: "Cleaning is overdue",
-                        subtitle: AppDateFormatter.scheduledDateDisplayText(for: scheduledDate)
+                        subtitle: AppDateFormatter.scheduledDateDisplayText(for: scheduledDate),
+                        isCompleted: false
                     )
                 }
             }
