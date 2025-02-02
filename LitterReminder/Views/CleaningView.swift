@@ -84,7 +84,7 @@ extension CleaningView {
                 if elapsedTime <= 3600 {
                     self.init(
                         imageSystemName: "clock.badge",
-                        badgeColor: .systemRed,
+                        badgeColor: .systemOrange,
                         title: "Cleaning is due",
                         subtitle: AppDateFormatter.scheduledDateDisplayText(for: scheduledDate),
                         isCompleted: false
@@ -92,7 +92,7 @@ extension CleaningView {
                 } else {
                     self.init(
                         imageSystemName: "clock.badge.exclamationmark",
-                        badgeColor: .systemOrange,
+                        badgeColor: .systemRed,
                         title: "Cleaning is overdue",
                         subtitle: AppDateFormatter.scheduledDateDisplayText(for: scheduledDate),
                         isCompleted: false

@@ -10,14 +10,29 @@ import SwiftData
 import SwiftUI
 
 extension ContentView {
-    @Observable
-    class ViewModel {
+    @Observable class ViewModel {
         var currentDate: Date
 
-        var cleanings = [Cleaning]()
+        private var cleanings = [Cleaning]()
+
+        var completedCleanings: [Cleaning] {
+            cleanings.filter({ $0.isComplete }).sorted(by: {
+                let completed1 = $0.completedDate ?? Date.distantPast
+                let completed2 = $1.completedDate ?? Date.distantPast
+
+                return completed1 > completed2
+            })
+        }
 
         var hasScheduledCleaning: Bool {
-            cleanings.first(where: { !$0.isComplete }) != nil
+            scheduledCleaning != nil
+        }
+
+        var scheduledCleaning: Cleaning? {
+            cleanings
+                .filter({ !$0.isComplete })
+                .sorted(by: { $0.scheduledDate < $1.scheduledDate })
+                .first
         }
 
         private var modelContext: ModelContext
@@ -96,11 +111,11 @@ extension ContentView {
         }
 
         func markComplete(_ currentDate: Date = .now) {
-            guard let mostRecent = cleanings.first, mostRecent.completedDate == nil else {
+            guard let scheduledCleaning else {
                 return
             }
 
-            mostRecent.completedDate = currentDate
+            scheduledCleaning.completedDate = currentDate
             saveChanges()
             fetchData()
         }

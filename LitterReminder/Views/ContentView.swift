@@ -12,35 +12,65 @@ struct ContentView: View {
     @Environment(\.scenePhase) private var scenePhase
     @State private var viewModel: ViewModel
     @State private var showConfirmMarkComplete = false
+    @State private var sheetContentHeight = CGFloat(0)
 
     var body: some View {
         VStack(spacing: 0) {
-            List {
-                ForEach(viewModel.cleanings) { cleaning in
-                    CleaningView(
-                        model: .init(
-                            currentDate: viewModel.currentDate,
-                            scheduledDate: cleaning.scheduledDate,
-                            completedDate: cleaning.completedDate
+            ScrollViewReader { proxy in
+                List {
+                    ForEach(viewModel.completedCleanings) { cleaning in
+                        CleaningView(
+                            model: .init(
+                                currentDate: viewModel.currentDate,
+                                scheduledDate: cleaning.scheduledDate,
+                                completedDate: cleaning.completedDate
+                            )
                         )
-                    )
-                    .swipeActions(edge: .trailing) {
-                        Button(role: .destructive) {
-                            viewModel.delete(cleaning)
-                        } label: {
-                            Label("Delete", systemImage: "trash")
+                        .swipeActions(edge: .trailing) {
+                            Button(role: .destructive) {
+                                viewModel.delete(cleaning)
+                            } label: {
+                                Label("Delete", systemImage: "trash")
+                            }
                         }
                     }
                 }
+                .listStyle(.plain)
             }
-            .listStyle(.plain)
 
-            VStack(spacing: 16) {
+            if let cleaning = viewModel.scheduledCleaning {
                 Divider()
 
-                actionButton
+                CleaningView(
+                    model: CleaningView.Model(
+                        currentDate: viewModel.currentDate,
+                        scheduledDate: cleaning.scheduledDate,
+                        completedDate: cleaning.completedDate
+                    )
+                )
+            } else {
+                Divider()
+                    .padding(.bottom)
             }
-            .frame(maxWidth: .infinity)
+
+            actionButton
+        }
+        .sheet(isPresented: $showConfirmMarkComplete) {
+            ConfirmView(confirmAction: { completedDate in
+                withAnimation {
+                    viewModel.markComplete(completedDate)
+                    viewModel.addCleaning(completedDate)
+                }
+            })
+                .background {
+                    GeometryReader { proxy in
+                        Color.clear
+                            .task {
+                                sheetContentHeight = proxy.size.height
+                            }
+                    }
+                }
+                .presentationDetents([.height(sheetContentHeight)])
         }
         .onChange(of: scenePhase) { _, newValue in
             if newValue == .active {
@@ -74,15 +104,6 @@ struct ContentView: View {
                 Text("Mark Complete")
             }
             .buttonStyle(PrimaryButtonStyle())
-            .confirmationDialog("Confirm", isPresented: $showConfirmMarkComplete) {
-                Button("Mark Complete", role: .destructive) {
-                    viewModel.markComplete()
-                    withAnimation {
-                        viewModel.addCleaning()
-                    }
-                }
-                Button("Cancel", role: .cancel) { }
-            }
         }
     }
 }

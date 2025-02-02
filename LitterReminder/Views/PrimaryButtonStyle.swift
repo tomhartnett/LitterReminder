@@ -24,6 +24,21 @@ struct PrimaryButtonStyle: PrimitiveButtonStyle {
     }
 }
 
+struct SecondaryButtonStyle: PrimitiveButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        Button(action: {
+            configuration.trigger()
+        }) {
+            configuration.label
+                .font(.title3)
+                .fontWeight(.medium)
+                .underline()
+                .padding(.vertical)
+                .padding(.horizontal, 32)
+        }
+    }
+}
+
 #Preview {
     VStack(alignment: .leading) {
         Button(action: {}) {
@@ -40,5 +55,17 @@ struct PrimaryButtonStyle: PrimitiveButtonStyle {
             Text("Remind me in 2 days")
         }
         .buttonStyle(PrimaryButtonStyle())
+
+        HStack {
+            Button(action: {}) {
+                Text("Cancel")
+            }
+            .buttonStyle(SecondaryButtonStyle())
+
+            Button(action: {}) {
+                Text("Confirm")
+            }
+            .buttonStyle(PrimaryButtonStyle())
+        }
     }
 }
