@@ -40,11 +40,6 @@
 			path = LitterReminder;
 			sourceTree = "<group>";
 		};
-		E25979C92CF22C0E00C0BE91 /* LitterReminderTests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = LitterReminderTests;
-			sourceTree = "<group>";
-		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -69,7 +64,6 @@
 			isa = PBXGroup;
 			children = (
 				E24C2AF62CEA43590060A1E9 /* LitterReminder */,
-				E25979C92CF22C0E00C0BE91 /* LitterReminderTests */,
 				E24C2AF52CEA43590060A1E9 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -120,9 +114,6 @@
 			);
 			dependencies = (
 				E25979CD2CF22C0E00C0BE91 /* PBXTargetDependency */,
-			);
-			fileSystemSynchronizedGroups = (
-				E25979C92CF22C0E00C0BE91 /* LitterReminderTests */,
 			);
 			name = LitterReminderTests;
 			packageProductDependencies = (
