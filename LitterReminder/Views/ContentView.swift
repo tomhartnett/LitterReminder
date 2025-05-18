@@ -21,50 +21,17 @@ struct ContentView: View {
 
     var body: some View {
         NavigationStack {
-            VStack(spacing: 24) {
-                if let lastCleaning = viewModel.completedCleanings.first,
-                   let completedDate = lastCleaning.completedDate {
-
-                    CleaningView(
-                        model: .init(
-                            imageSystemName: "clock.badge.checkmark",
-                            badgeColor: .systemGreen,
-                            title: "Last cleaning",
-                            subtitle1: completedDate.formattedString(),
-                            subtitle2: completedDate.relativeFormattedString()
-                        )
-                    )
-                    .background(
-                        RoundedRectangle(cornerSize: .init(width: 8, height: 8))
-                            .foregroundStyle(.background)
-                            .shadow(radius: 5)
-                    )
-                    .padding(.horizontal)
+            VStack {
+                if viewModel.hasScheduledCleaning || viewModel.hasCompletedCleanings {
+                    listView
+                } else {
+                    noDataView
                 }
 
-                if let cleaning = viewModel.scheduledCleaning {
-                    CleaningView(
-                        model: .init(
-                            currentDate: viewModel.currentDate,
-                            scheduledDate: cleaning.scheduledDate,
-                            completedDate: cleaning.completedDate
-                        )
-                    )
-                    .background(
-                        RoundedRectangle(cornerSize: .init(width: 8, height: 8))
-                            .foregroundStyle(.background)
-                            .shadow(radius: 5)
-                    )
-                    .padding(.horizontal)
-
-                }
-
-                if !viewModel.completedCleanings.isEmpty {
+                if viewModel.hasCompletedCleanings {
                     NavigationLink("History...", value: AppNavigation.history)
                         .font(.title)
                 }
-
-                Spacer()
 
                 actionButton
             }
@@ -73,7 +40,8 @@ struct ContentView: View {
             .navigationDestination(for: AppNavigation.self, destination: { navigation in
                 switch navigation {
                 case .history:
-                    HistoryView(currentDate: viewModel.currentDate, cleanings: viewModel.completedCleanings)
+                    HistoryView()
+                        .environment(viewModel)
                 }
             })
             .sheet(isPresented: $showConfirmMarkComplete) {
@@ -126,6 +94,66 @@ struct ContentView: View {
                 Text("Mark Complete")
             }
             .buttonStyle(PrimaryButtonStyle())
+        }
+    }
+
+    @ViewBuilder
+    private var listView: some View {
+        List {
+            if let lastCleaning = viewModel.completedCleanings.first,
+               let completedDate = lastCleaning.completedDate {
+
+                CleaningView(
+                    model: .init(
+                        imageSystemName: "clock.badge.checkmark",
+                        badgeColor: .systemGreen,
+                        title: "Last cleaning",
+                        subtitle1: completedDate.formattedString(),
+                        subtitle2: completedDate.relativeFormattedString()
+                    )
+                )
+                .swipeActions(edge: .trailing) {
+                    Button(role: .destructive) {
+                        viewModel.delete(lastCleaning)
+                    } label: {
+                        Label("Delete", systemImage: "trash")
+                    }
+                }
+            }
+
+            if let cleaning = viewModel.scheduledCleaning {
+                CleaningView(
+                    model: .init(
+                        currentDate: viewModel.currentDate,
+                        scheduledDate: cleaning.scheduledDate,
+                        completedDate: cleaning.completedDate
+                    )
+                )
+                .swipeActions(edge: .trailing) {
+                    Button(role: .destructive) {
+                        viewModel.delete(cleaning)
+                    } label: {
+                        Label("Delete", systemImage: "trash")
+                    }
+                }
+            }
+        }
+        .listStyle(PlainListStyle())
+    }
+
+    @ViewBuilder
+    private var noDataView: some View {
+        VStack {
+            Spacer()
+
+            Text("No data")
+                .font(.title)
+                .foregroundStyle(.secondary)
+
+            Text("Tap \"Schedule Cleaning\" to get started")
+                .foregroundStyle(.secondary)
+
+            Spacer()
         }
     }
 }

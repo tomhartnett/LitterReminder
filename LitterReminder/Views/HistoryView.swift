@@ -8,28 +8,54 @@
 import SwiftUI
 
 struct HistoryView: View {
-    var currentDate: Date
-    var cleanings: [Cleaning]
+    @Environment(ViewModel.self) private var viewModel
 
     var body: some View {
+        Group {
+            if viewModel.hasCompletedCleanings {
+                listView
+            } else {
+                noDataView
+            }
+        }
+        .navigationTitle("History")
+        .padding(.top)
+    }
+
+    @ViewBuilder
+    private var listView: some View {
         List {
-            ForEach(cleanings) { cleaning in
+            ForEach(viewModel.completedCleanings) { cleaning in
                 CleaningView(
                     model: .init(
-                        currentDate: currentDate,
+                        currentDate: viewModel.currentDate,
                         scheduledDate: cleaning.scheduledDate,
                         completedDate: cleaning.completedDate
                     )
                 )
+                .swipeActions(edge: .trailing) {
+                    Button(role: .destructive) {
+                        viewModel.delete(cleaning)
+                    } label: {
+                        Label("Delete", systemImage: "trash")
+                    }
+                }
             }
         }
         .listStyle(PlainListStyle())
-        .navigationTitle("History")
-        .padding(.top)
+    }
+
+    @ViewBuilder
+    private var noDataView: some View {
+        ZStack {
+            Text("No data")
+                .font(.title)
+                .foregroundStyle(.secondary)
+        }
     }
 }
 
 #Preview {
-    HistoryView(currentDate: .now,
-                cleanings: [])
+    HistoryView()
+        .environment(ViewModel(modelContext: previewContainer.mainContext))
 }

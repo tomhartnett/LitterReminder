@@ -16,9 +16,9 @@ let previewContainer: ModelContainer = {
             configurations: ModelConfiguration(isStoredInMemoryOnly: true)
         )
         let modelContext = container.mainContext
-        if try modelContext.fetch(FetchDescriptor<Cleaning>()).isEmpty {
-            SampleCleaningsList.contents.forEach { container.mainContext.insert($0) }
-        }
+//        if try modelContext.fetch(FetchDescriptor<Cleaning>()).isEmpty {
+//            SampleCleaningsList.contents.forEach { container.mainContext.insert($0) }
+//        }
         return container
     } catch {
         fatalError("Failed to create container")
