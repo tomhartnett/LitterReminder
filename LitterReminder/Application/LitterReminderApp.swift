@@ -10,18 +10,29 @@ import SwiftUI
 
 @main
 struct LitterReminderApp: App {
+    @Environment(\.scenePhase) private var scenePhase
     let container: ModelContainer
+    let viewModel: ViewModel
 
     var body: some Scene {
         WindowGroup {
-            ContentView(modelContext: container.mainContext)
+            ContentView()
+                .environment(viewModel)
         }
         .modelContainer(container)
+        .onChange(of: scenePhase) { _, newValue in
+            if newValue == .active {
+                viewModel.fetchData()
+                viewModel.updateCurrentDate()
+                viewModel.requestRemindersAccess()
+            }
+        }
     }
 
     init() {
         do {
             container = try ModelContainer(for: Cleaning.self)
+            viewModel = ViewModel(modelContext: container.mainContext)
         } catch {
             fatalError("Failed to create ModelContainer for Cleaning.")
         }

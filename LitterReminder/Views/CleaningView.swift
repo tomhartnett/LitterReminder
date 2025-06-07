@@ -73,9 +73,8 @@ extension CleaningView {
                 self.init(
                     imageSystemName: "clock.badge.checkmark",
                     badgeColor: .systemGreen,
-                    title: "Completed",
-                    subtitle1: completedDate.formattedString(),
-                    subtitle2: completedDate.relativeFormattedString()
+                    title: completedDate.formattedString(),
+                    subtitle1: completedDate.relativeFormattedString()
                 )
             } else if currentDate < scheduledDate {
                 self.init(

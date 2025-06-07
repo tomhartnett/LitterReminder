@@ -11,15 +11,17 @@ struct HistoryView: View {
     @Environment(ViewModel.self) private var viewModel
 
     var body: some View {
-        Group {
-            if viewModel.hasCompletedCleanings {
-                listView
-            } else {
-                noDataView
+        VStack {
+            Group {
+                if viewModel.hasCompletedCleanings {
+                    listView
+                } else {
+                    noDataView
+                }
             }
+            .navigationTitle("History")
+            .padding(.top)
         }
-        .navigationTitle("History")
-        .padding(.top)
     }
 
     @ViewBuilder
