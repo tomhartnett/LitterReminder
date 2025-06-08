@@ -42,7 +42,14 @@ import SwiftUI
 
     private var eventStore: EKEventStore
 
-    init(modelContext: ModelContext, currentDate: Date = .now) {
+    let dependencies: Dependencies
+
+    init(
+        dependencies: Dependencies,
+        modelContext: ModelContext,
+        currentDate: Date = .now
+    ) {
+        self.dependencies = dependencies
         self.modelContext = modelContext
         self.currentDate = currentDate
         self.eventStore = EKEventStore()
@@ -50,47 +57,19 @@ import SwiftUI
     }
 
     func addCleaning(_ currentDate: Date = .now) {
-        let calendar = Calendar.autoupdatingCurrent
-        let tempDate = calendar.date(byAdding: .day, value: 2, to: currentDate)!
-        // TODO: settings to customize scheduling
-        let scheduledDate = calendar.date(bySettingHour: 17, minute: 0, second: 0, of: tempDate)!
+        let scheduledDate = dependencies.schedulingService.nextCleaningDate()
 
-        addReminder(scheduledDate)
+        dependencies.reminderService.addReminder(scheduledDate)
         // TODO: get unique id of reminder and save on cleaning object
 
         let cleaning = Cleaning(createdDate: currentDate, scheduledDate: scheduledDate)
         modelContext.insert(cleaning)
         saveChanges()
         fetchData()
-    }
 
-    func addReminder(_ date: Date) {
-        guard let calendar = eventStore.calendars(for: .reminder).first(where: { $0.title == "Reminders" }) else {
-            return
+        Task {
+            await dependencies.notificationService.scheduleNotification(scheduledDate)
         }
-
-        let reminder = EKReminder(eventStore: eventStore)
-        reminder.title = "Scoop the poop"
-        reminder.calendar = calendar
-
-        let dueDateComps = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: date)
-        reminder.dueDateComponents = DateComponents(
-            year: dueDateComps.year,
-            month: dueDateComps.month,
-            day: dueDateComps.day,
-            hour: dueDateComps.hour,
-            minute: dueDateComps.minute
-        )
-
-        reminder.addAlarm(EKAlarm(absoluteDate: date))
-
-        do {
-            try eventStore.save(reminder, commit: true)
-        } catch {
-            // Message error
-        }
-
-        // TODO: return unique id of reminder
     }
 
     func delete(_ cleaning: Cleaning) {
@@ -123,29 +102,11 @@ import SwiftUI
         fetchData()
     }
 
-    func requestRemindersAccess() {
-        let status = EKEventStore.authorizationStatus(for: .reminder)
-        switch status {
-        case .notDetermined:
-            eventStore.requestFullAccessToReminders { granted, errorOrNil in
-                if errorOrNil != nil {
-                    // Message error
-                }
+    func requestAuthorization() {
+        dependencies.reminderService.requestRemindersAccess()
 
-                if !granted {
-                    // Message something
-                }
-            }
-        case .restricted:
-            break // Need to prompt for something
-        case .denied:
-            break // Need to prompt for Settings
-        case .fullAccess:
-            break
-        case .writeOnly:
-            break // Should never happen
-        @unknown default:
-            break
+        Task {
+            await dependencies.notificationService.requestAuthorization()
         }
     }
 

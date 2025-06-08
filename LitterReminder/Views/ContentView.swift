@@ -35,7 +35,12 @@ struct ContentView: View {
 
 #Preview {
     ContentView()
-        .environment(ViewModel(modelContext: previewContainer.mainContext))
+        .environment(
+            ViewModel(
+                dependencies: AppDependencies(), // TODO: mock/preview dependencies
+                modelContext: previewContainer.mainContext
+            )
+        )
 }
 
 

@@ -24,7 +24,7 @@ struct LitterReminderApp: App {
             if newValue == .active {
                 viewModel.fetchData()
                 viewModel.updateCurrentDate()
-                viewModel.requestRemindersAccess()
+                viewModel.requestAuthorization()
             }
         }
     }
@@ -32,7 +32,7 @@ struct LitterReminderApp: App {
     init() {
         do {
             container = try ModelContainer(for: Cleaning.self)
-            viewModel = ViewModel(modelContext: container.mainContext)
+            viewModel = ViewModel(dependencies: AppDependencies(), modelContext: container.mainContext)
         } catch {
             fatalError("Failed to create ModelContainer for Cleaning.")
         }
