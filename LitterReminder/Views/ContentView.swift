@@ -8,15 +8,10 @@
 import SwiftData
 import SwiftUI
 
-enum AppNavigation {
-    case history
-}
-
 struct ContentView: View {
     @Environment(ViewModel.self) private var viewModel
     @State private var showConfirmMarkComplete = false
     @State private var sheetContentHeight = CGFloat(0)
-    @State private var navigation: AppNavigation?
 
     var body: some View {
         TabView {

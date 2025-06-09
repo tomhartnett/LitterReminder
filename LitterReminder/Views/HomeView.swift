@@ -25,13 +25,6 @@ struct HomeView: View {
         }
         .padding(.top)
         .navigationTitle("Litter Reminder")
-        .navigationDestination(for: AppNavigation.self, destination: { navigation in
-            switch navigation {
-            case .history:
-                HistoryView()
-                    .environment(viewModel)
-            }
-        })
         .sheet(isPresented: $showConfirmMarkComplete) {
             ConfirmView(confirmAction: { completedDate in
                 withAnimation {
