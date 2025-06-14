@@ -12,6 +12,8 @@ import SwiftUI
 @Observable class ViewModel {
     var currentDate: Date
 
+    var errorMessage: String?
+
     private var cleanings = [Cleaning]()
 
     var completedCleanings: [Cleaning] {
@@ -59,7 +61,12 @@ import SwiftUI
     func addCleaning(_ currentDate: Date = .now) {
         let scheduledDate = dependencies.schedulingService.nextCleaningDate()
 
-        let reminderID = dependencies.reminderService.addReminder(scheduledDate)
+        var reminderID: String?
+        do {
+            reminderID = try dependencies.reminderService.addReminder(scheduledDate)
+        } catch {
+            errorMessage = error.localizedDescription
+        }
 
         let cleaning = Cleaning(
             createdDate: currentDate,
@@ -78,7 +85,11 @@ import SwiftUI
 
     func delete(_ cleaning: Cleaning) {
         if let reminderID = cleaning.reminderID {
-            dependencies.reminderService.deleteReminder(reminderID)
+            do {
+                try dependencies.reminderService.deleteReminder(reminderID)
+            } catch {
+                errorMessage = error.localizedDescription
+            }
         }
 
         modelContext.delete(cleaning)
@@ -106,7 +117,11 @@ import SwiftUI
         }
 
         if let reminderID = scheduledCleaning.reminderID {
-            dependencies.reminderService.completeReminder(reminderID, completionDate: currentDate)
+            do {
+                try dependencies.reminderService.completeReminder(reminderID, completionDate: currentDate)
+            } catch {
+                errorMessage = error.localizedDescription
+            }
         }
 
         scheduledCleaning.completedDate = currentDate

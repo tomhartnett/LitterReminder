@@ -25,6 +25,17 @@ struct HomeView: View {
         }
         .padding(.top)
         .navigationTitle("Litter Reminder")
+        .alert("Error", isPresented: .constant(viewModel.errorMessage != nil), actions: {
+            Button("OK") {
+                viewModel.errorMessage = nil
+            }
+        }, message: {
+            if let errorMessage = viewModel.errorMessage {
+                Text(errorMessage)
+            } else {
+                Text("An unknown error has occurred.")
+            }
+        })
         .sheet(isPresented: $showConfirmMarkComplete) {
             ConfirmView(confirmAction: { completedDate in
                 withAnimation {

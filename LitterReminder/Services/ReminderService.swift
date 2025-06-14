@@ -9,18 +9,43 @@ import EventKit
 import Foundation
 
 protocol ReminderService {
-    func addReminder(_ dueDate: Date) -> String?
-    func completeReminder(_ identifier: String, completionDate: Date)
-    func deleteReminder(_ identifier: String)
+    func addReminder(_ dueDate: Date) throws -> String
+    func completeReminder(_ identifier: String, completionDate: Date) throws
+    func deleteReminder(_ identifier: String) throws
     func requestRemindersAccess()
+}
+
+enum ReminderServiceError: Error, LocalizedError {
+    case calendarNotFound
+    case failedToRemove(Error?)
+    case failedToSave(Error?)
+
+    var errorDescription: String? {
+        switch self {
+        case .calendarNotFound:
+            return "Could not retrieve the Reminders calendar from the system."
+        case .failedToRemove(let error):
+            if let error {
+                return "Could not remove reminder from the system: \(error.localizedDescription)"
+            } else {
+                return "Could not remove reminder from the system."
+            }
+        case .failedToSave(let error):
+            if let error {
+                return "Could not save reminder to the system: \(error.localizedDescription)"
+            } else {
+                return "Could not save reminder to the system."
+            }
+        }
+    }
 }
 
 class DefaultReminderService: ReminderService {
     let eventStore = EKEventStore()
 
-    func addReminder(_ dueDate: Date) -> String? {
+    func addReminder(_ dueDate: Date) throws -> String {
         guard let calendar = eventStore.calendars(for: .reminder).first(where: { $0.title == "Reminders" }) else {
-            return nil
+            throw ReminderServiceError.calendarNotFound
         }
 
         let reminder = EKReminder(eventStore: eventStore)
@@ -33,13 +58,11 @@ class DefaultReminderService: ReminderService {
             try eventStore.save(reminder, commit: true)
             return reminder.calendarItemIdentifier
         } catch {
-            
+            throw ReminderServiceError.failedToSave(error)
         }
-
-        return nil
     }
 
-    func completeReminder(_ identifier: String, completionDate: Date) {
+    func completeReminder(_ identifier: String, completionDate: Date) throws {
         guard let reminder = eventStore.calendarItem(withIdentifier: identifier) as? EKReminder else {
             return
         }
@@ -50,11 +73,11 @@ class DefaultReminderService: ReminderService {
         do {
             try eventStore.save(reminder, commit: true)
         } catch {
-
+            throw ReminderServiceError.failedToSave(error)
         }
     }
 
-    func deleteReminder(_ identifier: String) {
+    func deleteReminder(_ identifier: String) throws {
         guard let reminder = eventStore.calendarItem(withIdentifier: identifier) as? EKReminder else {
             return
         }
@@ -62,7 +85,7 @@ class DefaultReminderService: ReminderService {
         do {
             try eventStore.remove(reminder, commit: true)
         } catch {
-
+            throw ReminderServiceError.failedToRemove(error)
         }
     }
 
