@@ -9,16 +9,18 @@ import EventKit
 import Foundation
 
 protocol ReminderService {
-    func addReminder(_ dueDate: Date)
+    func addReminder(_ dueDate: Date) -> String?
+    func completeReminder(_ identifier: String, completionDate: Date)
+    func deleteReminder(_ identifier: String)
     func requestRemindersAccess()
 }
 
 class DefaultReminderService: ReminderService {
     let eventStore = EKEventStore()
 
-    func addReminder(_ dueDate: Date) {
+    func addReminder(_ dueDate: Date) -> String? {
         guard let calendar = eventStore.calendars(for: .reminder).first(where: { $0.title == "Reminders" }) else {
-            return
+            return nil
         }
 
         let reminder = EKReminder(eventStore: eventStore)
@@ -29,6 +31,36 @@ class DefaultReminderService: ReminderService {
 
         do {
             try eventStore.save(reminder, commit: true)
+            return reminder.calendarItemIdentifier
+        } catch {
+            
+        }
+
+        return nil
+    }
+
+    func completeReminder(_ identifier: String, completionDate: Date) {
+        guard let reminder = eventStore.calendarItem(withIdentifier: identifier) as? EKReminder else {
+            return
+        }
+
+        reminder.isCompleted = true
+        reminder.completionDate = completionDate
+
+        do {
+            try eventStore.save(reminder, commit: true)
+        } catch {
+
+        }
+    }
+
+    func deleteReminder(_ identifier: String) {
+        guard let reminder = eventStore.calendarItem(withIdentifier: identifier) as? EKReminder else {
+            return
+        }
+
+        do {
+            try eventStore.remove(reminder, commit: true)
         } catch {
 
         }

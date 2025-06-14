@@ -13,14 +13,21 @@ class Cleaning {
     var createdDate: Date
     var scheduledDate: Date
     var completedDate: Date?
+    var reminderID: String?
 
     var isComplete: Bool {
         completedDate != nil
     }
 
-    init(createdDate: Date, scheduledDate: Date, completedDate: Date? = nil) {
+    init(
+        createdDate: Date,
+        scheduledDate: Date,
+        completedDate: Date? = nil,
+        reminderID: String? = nil
+    ) {
         self.createdDate = createdDate
         self.scheduledDate = scheduledDate
         self.completedDate = completedDate
+        self.reminderID = reminderID
     }
 }

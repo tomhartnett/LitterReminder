@@ -59,10 +59,14 @@ import SwiftUI
     func addCleaning(_ currentDate: Date = .now) {
         let scheduledDate = dependencies.schedulingService.nextCleaningDate()
 
-        dependencies.reminderService.addReminder(scheduledDate)
-        // TODO: get unique id of reminder and save on cleaning object
+        let reminderID = dependencies.reminderService.addReminder(scheduledDate)
 
-        let cleaning = Cleaning(createdDate: currentDate, scheduledDate: scheduledDate)
+        let cleaning = Cleaning(
+            createdDate: currentDate,
+            scheduledDate: scheduledDate,
+            reminderID: reminderID
+        )
+
         modelContext.insert(cleaning)
         saveChanges()
         fetchData()
@@ -73,6 +77,10 @@ import SwiftUI
     }
 
     func delete(_ cleaning: Cleaning) {
+        if let reminderID = cleaning.reminderID {
+            dependencies.reminderService.deleteReminder(reminderID)
+        }
+
         modelContext.delete(cleaning)
         saveChanges()
         fetchData()
@@ -95,6 +103,10 @@ import SwiftUI
     func markComplete(_ currentDate: Date = .now) {
         guard let scheduledCleaning else {
             return
+        }
+
+        if let reminderID = scheduledCleaning.reminderID {
+            dependencies.reminderService.completeReminder(reminderID, completionDate: currentDate)
         }
 
         scheduledCleaning.completedDate = currentDate
