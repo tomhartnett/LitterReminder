@@ -10,9 +10,11 @@ import SwiftUI
 
 @main
 struct LitterReminderApp: App {
+    @UIApplicationDelegateAdaptor private var appDelegate: AppDelegate
     @Environment(\.scenePhase) private var scenePhase
     let container: ModelContainer
     let viewModel: ViewModel
+    let dependencies: Dependencies
 
     var body: some Scene {
         WindowGroup {
@@ -32,7 +34,10 @@ struct LitterReminderApp: App {
     init() {
         do {
             container = try ModelContainer(for: Cleaning.self)
-            viewModel = ViewModel(dependencies: AppDependencies(), modelContext: container.mainContext)
+            dependencies = AppDependencies()
+            viewModel = ViewModel(dependencies: dependencies, modelContext: container.mainContext)
+            appDelegate.dependencies = dependencies
+            appDelegate.modelContainer = container
         } catch {
             fatalError("Failed to create ModelContainer for Cleaning.")
         }

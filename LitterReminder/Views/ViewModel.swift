@@ -61,35 +61,36 @@ import SwiftUI
     func addCleaning(_ currentDate: Date = .now) {
         let scheduledDate = dependencies.schedulingService.nextCleaningDate()
 
-        var reminderID: String?
-        do {
-            reminderID = try dependencies.reminderService.addReminder(scheduledDate)
-        } catch {
-            errorMessage = error.localizedDescription
-        }
-
-        let cleaning = Cleaning(
-            createdDate: currentDate,
-            scheduledDate: scheduledDate,
-            reminderID: reminderID
-        )
-
-        modelContext.insert(cleaning)
-        saveChanges()
-        fetchData()
+        // TODO: handle error
+        let reminderID = try? dependencies.reminderService.addReminder(scheduledDate)
 
         Task {
-            await dependencies.notificationService.scheduleNotification(scheduledDate)
+            // TODO: handle error
+            let notificationID = try? await dependencies.notificationService.scheduleNotification(scheduledDate)
+
+            await MainActor.run {
+                let cleaning = Cleaning(
+                    createdDate: currentDate,
+                    scheduledDate: scheduledDate,
+                    notificationID: notificationID,
+                    reminderID: reminderID
+                )
+
+                modelContext.insert(cleaning)
+                saveChanges()
+                fetchData()
+            }
         }
     }
 
     func delete(_ cleaning: Cleaning) {
         if let reminderID = cleaning.reminderID {
-            do {
-                try dependencies.reminderService.deleteReminder(reminderID)
-            } catch {
-                errorMessage = error.localizedDescription
-            }
+            // TODO: handle error
+            try? dependencies.reminderService.deleteReminder(reminderID)
+        }
+
+        if let notificationID = cleaning.notificationID {
+            dependencies.notificationService.deleteNotification(notificationID)
         }
 
         modelContext.delete(cleaning)
@@ -107,7 +108,7 @@ import SwiftUI
             descriptor.fetchLimit = 20
             cleanings = try modelContext.fetch(descriptor)
         } catch {
-            print("Fetch failed")
+            // TODO: handle error
         }
     }
 
@@ -117,11 +118,8 @@ import SwiftUI
         }
 
         if let reminderID = scheduledCleaning.reminderID {
-            do {
-                try dependencies.reminderService.completeReminder(reminderID, completionDate: currentDate)
-            } catch {
-                errorMessage = error.localizedDescription
-            }
+            // TODO: handle error
+            try? dependencies.reminderService.completeReminder(reminderID, completionDate: currentDate)
         }
 
         scheduledCleaning.completedDate = currentDate
@@ -133,7 +131,8 @@ import SwiftUI
         dependencies.reminderService.requestRemindersAccess()
 
         Task {
-            await dependencies.notificationService.requestAuthorization()
+            // TODO: handle error
+            try await dependencies.notificationService.requestAuthorization()
         }
     }
 

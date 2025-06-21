@@ -13,6 +13,7 @@ protocol ReminderService {
     func completeReminder(_ identifier: String, completionDate: Date) throws
     func deleteReminder(_ identifier: String) throws
     func requestRemindersAccess()
+    func rescheduleReminder(_ identifier: String, dueDate: Date) throws
 }
 
 enum ReminderServiceError: Error, LocalizedError {
@@ -25,17 +26,9 @@ enum ReminderServiceError: Error, LocalizedError {
         case .calendarNotFound:
             return "Could not retrieve the Reminders calendar from the system."
         case .failedToRemove(let error):
-            if let error {
-                return "Could not remove reminder from the system: \(error.localizedDescription)"
-            } else {
-                return "Could not remove reminder from the system."
-            }
+            return "Could not remove reminder from the system".appendingError(error)
         case .failedToSave(let error):
-            if let error {
-                return "Could not save reminder to the system: \(error.localizedDescription)"
-            } else {
-                return "Could not save reminder to the system."
-            }
+            return "Could not save reminder to the system".appendingError(error)
         }
     }
 }
@@ -112,6 +105,20 @@ class DefaultReminderService: ReminderService {
             break // Should never happen
         @unknown default:
             break
+        }
+    }
+
+    func rescheduleReminder(_ identifier: String, dueDate: Date) throws {
+        guard let reminder = eventStore.calendarItem(withIdentifier: identifier) as? EKReminder else {
+            return
+        }
+
+        reminder.dueDateComponents = dueDate.dueDateComponents()
+
+        do {
+            try eventStore.save(reminder, commit: true)
+        } catch {
+            throw ReminderServiceError.failedToSave(error)
         }
     }
 }

@@ -39,8 +39,8 @@ struct HomeView: View {
         .sheet(isPresented: $showConfirmMarkComplete) {
             ConfirmView(confirmAction: { completedDate in
                 withAnimation {
-                    viewModel.markComplete(completedDate)
                     viewModel.addCleaning(completedDate)
+                    viewModel.markComplete(completedDate)
                 }
             })
             .background {
@@ -59,8 +59,10 @@ struct HomeView: View {
     private var actionButton: some View {
         if !viewModel.hasScheduledCleaning {
             Button(action: {
-                withAnimation {
-                    viewModel.addCleaning()
+                Task {
+                    withAnimation {
+                        viewModel.addCleaning()
+                    }
                 }
             }) {
                 Text("Schedule Cleaning")
