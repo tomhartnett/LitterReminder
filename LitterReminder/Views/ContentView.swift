@@ -32,10 +32,7 @@ struct ContentView: View {
     ContentView()
         .environment(
             ViewModel(
-                dependencies: AppDependencies(), // TODO: mock/preview dependencies
-                modelContext: previewContainer.mainContext
+                dependencies: PreviewDependencies()
             )
         )
 }
-
-

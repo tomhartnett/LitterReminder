@@ -35,6 +35,7 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
         case NotificationConstants.reminderLaterAction:
             guard let scheduleService = dependencies?.schedulingService,
                   let notificationService = dependencies?.notificationService,
+                  let cleaningService = dependencies?.cleaningService,
                   let existingDueDate = content.userInfo[NotificationConstants.userInfoDueDate] as? Date,
                   let occurrence = content.userInfo[NotificationConstants.userInfoOccurrence] as? Int else {
                 break
@@ -48,19 +49,13 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
                     occurrence: occurrence + 1
                 )
 
-                let descripter = FetchDescriptor<Cleaning>(
-                    predicate: #Predicate { cleaning in cleaning.notificationID == existingNotificationID }
-                )
-
-                let cleaning = try modelContainer?.mainContext.fetch(descripter).first
-                cleaning?.notificationID = newNotificationID
-
-                if let reminderID = cleaning?.reminderID {
-                    try dependencies?.reminderService.rescheduleReminder(reminderID, dueDate: newDueDate)
+                if let cleaning = try cleaningService.fetchCleaning(byNotificationID: existingNotificationID) {
+                    cleaning.notificationID = newNotificationID
+                    if let reminderID = cleaning.reminderID {
+                        try dependencies?.reminderService.rescheduleReminder(reminderID, dueDate: newDueDate)
+                    }
+                    try cleaningService.updateCleaning(cleaning)
                 }
-
-                try modelContainer?.mainContext.save()
-
             } catch {
                 // TODO: handle error
             }

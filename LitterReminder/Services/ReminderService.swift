@@ -33,7 +33,7 @@ enum ReminderServiceError: Error, LocalizedError {
     }
 }
 
-class DefaultReminderService: ReminderService {
+final class DefaultReminderService: ReminderService {
     let eventStore = EKEventStore()
 
     func addReminder(_ dueDate: Date) throws -> String {
@@ -121,4 +121,18 @@ class DefaultReminderService: ReminderService {
             throw ReminderServiceError.failedToSave(error)
         }
     }
+}
+
+final class PreviewReminderService: ReminderService {
+    func addReminder(_ dueDate: Date) throws -> String {
+        return UUID().uuidString
+    }
+    
+    func completeReminder(_ identifier: String, completionDate: Date) throws {}
+
+    func deleteReminder(_ identifier: String) throws {}
+
+    func requestRemindersAccess() {}
+
+    func rescheduleReminder(_ identifier: String, dueDate: Date) throws {}
 }

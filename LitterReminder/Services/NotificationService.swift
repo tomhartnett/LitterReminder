@@ -42,7 +42,7 @@ extension NotificationService {
     }
 }
 
-class DefaultNotificationService: NotificationService {
+final class DefaultNotificationService: NotificationService {
     let center = UNUserNotificationCenter.current()
 
     func registerNotifications() {
@@ -105,5 +105,17 @@ class DefaultNotificationService: NotificationService {
         } else {
             return "😿 The litter box is way overdue for cleaning 🙀"
         }
+    }
+}
+
+final class PreviewNotificationService: NotificationService {
+    func deleteNotification(_ identifier: String) {}
+
+    func registerNotifications() {}
+
+    func requestAuthorization() async throws {}
+
+    func scheduleNotification(_ dueDate: Date, occurrence: Int) async throws -> String {
+        UUID().uuidString
     }
 }

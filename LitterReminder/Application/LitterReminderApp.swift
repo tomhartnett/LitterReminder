@@ -34,12 +34,22 @@ struct LitterReminderApp: App {
     init() {
         do {
             container = try ModelContainer(for: Cleaning.self)
-            dependencies = AppDependencies()
-            viewModel = ViewModel(dependencies: dependencies, modelContext: container.mainContext)
+
+            let cleaningRepository = DefaultCleaningRepository(modelContext: container.mainContext)
+
+            dependencies = AppDependencies(
+                cleaningService: DefaultCleaningService(repository: cleaningRepository),
+                notificationService: DefaultNotificationService(),
+                reminderService: DefaultReminderService(),
+                schedulingService: DefaultSchedulingService()
+            )
+
+            viewModel = ViewModel(dependencies: dependencies)
+
             appDelegate.dependencies = dependencies
             appDelegate.modelContainer = container
         } catch {
-            fatalError("Failed to create ModelContainer for Cleaning.")
+            fatalError("Failed to create dependencies or ViewModel.")
         }
     }
 }

@@ -95,3 +95,13 @@ final class DebugSchedulingService: SchedulingService {
         return newDueDate
     }
 }
+
+final class PreviewSchedulingService: SchedulingService {
+    func snoozeCleaningDate(_ existingDueDate: Date, calendar: Calendar) -> Date {
+        return Date().addingTimeInterval(86_400)
+    }
+    
+    func nextCleaningDate(_ currentDate: Date, calendar: Calendar) -> Date {
+        return Date().addingTimeInterval(86_400 * 2)
+    }
+}

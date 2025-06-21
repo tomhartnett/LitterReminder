@@ -40,19 +40,15 @@ import SwiftUI
             .first
     }
 
-    private var modelContext: ModelContext
-
     private var eventStore: EKEventStore
 
     let dependencies: Dependencies
 
     init(
         dependencies: Dependencies,
-        modelContext: ModelContext,
         currentDate: Date = .now
     ) {
         self.dependencies = dependencies
-        self.modelContext = modelContext
         self.currentDate = currentDate
         self.eventStore = EKEventStore()
         fetchData()
@@ -69,16 +65,17 @@ import SwiftUI
             let notificationID = try? await dependencies.notificationService.scheduleNotification(scheduledDate)
 
             await MainActor.run {
-                let cleaning = Cleaning(
-                    createdDate: currentDate,
-                    scheduledDate: scheduledDate,
-                    notificationID: notificationID,
-                    reminderID: reminderID
-                )
-
-                modelContext.insert(cleaning)
-                saveChanges()
-                fetchData()
+                do {
+                    try dependencies.cleaningService.addCleaning(
+                        currentDate: currentDate,
+                        scheduledDate: scheduledDate,
+                        notificationID: notificationID,
+                        reminderID: reminderID
+                    )
+                    fetchData()
+                } catch {
+                    // TODO: handle error
+                }
             }
         }
     }
@@ -93,20 +90,17 @@ import SwiftUI
             dependencies.notificationService.deleteNotification(notificationID)
         }
 
-        modelContext.delete(cleaning)
-        saveChanges()
-        fetchData()
+        do {
+            try dependencies.cleaningService.deleteCleaning(cleaning)
+            fetchData()
+        } catch {
+            // TODO: handle error
+        }
     }
 
     func fetchData() {
         do {
-            var descriptor = FetchDescriptor<Cleaning>(
-                sortBy: [
-                    SortDescriptor(\.createdDate, order: .reverse)
-                ]
-            )
-            descriptor.fetchLimit = 20
-            cleanings = try modelContext.fetch(descriptor)
+            cleanings = try dependencies.cleaningService.fetchAllCleanings(limit: 20)
         } catch {
             // TODO: handle error
         }
@@ -122,9 +116,12 @@ import SwiftUI
             try? dependencies.reminderService.completeReminder(reminderID, completionDate: currentDate)
         }
 
-        scheduledCleaning.completedDate = currentDate
-        saveChanges()
-        fetchData()
+        do {
+            try dependencies.cleaningService.markComplete(scheduledCleaning, currentDate: currentDate)
+            fetchData()
+        } catch {
+            // TODO: handle error
+        }
     }
 
     func requestAuthorization() {
@@ -138,13 +135,5 @@ import SwiftUI
 
     func updateCurrentDate() {
         currentDate = .now
-    }
-
-    private func saveChanges() {
-        do {
-            try modelContext.save()
-        } catch {
-            print("Saved failed")
-        }
     }
 }
