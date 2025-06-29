@@ -60,6 +60,18 @@ final class DefaultReminderService: ReminderService {
             return
         }
 
+        // TODO: find reminders by dueDate instead
+        /*
+         var predicate: NSPredicate? = store.predicateForReminders(in: nil)
+         if let aPredicate = predicate {
+             store.fetchReminders(matching: aPredicate, completion: {(_ reminders: [Any]?) -> Void in
+                 for reminder: EKReminder? in reminders as? [EKReminder?] ?? [EKReminder?]() {
+                     // Do something for each reminder.
+                 }
+             })
+         }
+         */
+
         reminder.isCompleted = true
         reminder.completionDate = completionDate
 

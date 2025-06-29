@@ -33,7 +33,10 @@ struct LitterReminderApp: App {
 
     init() {
         do {
-            container = try ModelContainer(for: Cleaning.self)
+            container = try ModelContainer(
+                for: Cleaning.self,
+                migrationPlan: CleaningMigrationPlan.self
+            )
 
             let cleaningRepository = DefaultCleaningRepository(modelContext: container.mainContext)
 

@@ -2,12 +2,24 @@ import Foundation
 
 protocol CleaningService {
     func getScheduledCleaning() throws -> Cleaning?
+
     func getCompletedCleanings() throws -> [Cleaning]
-    func addCleaning(currentDate: Date, scheduledDate: Date, notificationID: String?, reminderID: String?) throws
+
+    func addCleaning(
+        currentDate: Date,
+        scheduledDate: Date,
+        notificationID: String?,
+        reminderID: String?
+    ) throws -> String
+
     func markComplete(_ cleaning: Cleaning, currentDate: Date) throws
+
     func deleteCleaning(_ cleaning: Cleaning) throws
+
     func fetchAllCleanings(limit: Int?) throws -> [Cleaning]
+
     func fetchCleaning(byNotificationID id: String) throws -> Cleaning?
+
     func updateCleaning(_ cleaning: Cleaning) throws
 }
 
@@ -31,14 +43,22 @@ final class DefaultCleaningService: CleaningService {
             .sorted { ($0.completedDate ?? .distantPast) > ($1.completedDate ?? .distantPast) }
     }
     
-    func addCleaning(currentDate: Date, scheduledDate: Date, notificationID: String?, reminderID: String?) throws {
+    func addCleaning(
+        currentDate: Date,
+        scheduledDate: Date,
+        notificationID: String?,
+        reminderID: String?
+    ) throws -> String {
         let cleaning = Cleaning(
             createdDate: currentDate,
             scheduledDate: scheduledDate,
             notificationID: notificationID,
             reminderID: reminderID
         )
+
         try repository.addCleaning(cleaning)
+
+        return cleaning.identifier.uuidString
     }
     
     func markComplete(_ cleaning: Cleaning, currentDate: Date) throws {
@@ -78,8 +98,15 @@ final class PreviewCleaningService: CleaningService {
         return []
     }
     
-    func addCleaning(currentDate: Date, scheduledDate: Date, notificationID: String?, reminderID: String?) throws {}
-    
+    func addCleaning(
+        currentDate: Date,
+        scheduledDate: Date,
+        notificationID: String?,
+        reminderID: String?
+    ) throws -> String {
+        return UUID().uuidString
+    }
+
     func markComplete(_ cleaning: Cleaning, currentDate: Date) throws {}
     
     func deleteCleaning(_ cleaning: Cleaning) throws {}

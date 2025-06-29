@@ -12,6 +12,7 @@ protocol Dependencies {
     var reminderService: ReminderService { get }
     var schedulingService: SchedulingService { get }
     var cleaningService: CleaningService { get }
+    var markCompleteUseCase: MarkCompleteUseCase { get }
 }
 
 final class AppDependencies: Dependencies {
@@ -19,6 +20,7 @@ final class AppDependencies: Dependencies {
     let notificationService: NotificationService
     let reminderService: ReminderService
     let schedulingService: SchedulingService
+    let markCompleteUseCase: MarkCompleteUseCase
 
     init(
         cleaningService: CleaningService,
@@ -30,6 +32,13 @@ final class AppDependencies: Dependencies {
         self.notificationService = notificationService
         self.reminderService = reminderService
         self.schedulingService = schedulingService
+
+        markCompleteUseCase = DefaultMarkCompleteUseCase(
+            cleaningService: cleaningService,
+            reminderService: reminderService,
+            notificationService: notificationService,
+            schedulingService: schedulingService
+        )
     }
 }
 
@@ -38,4 +47,5 @@ final class PreviewDependencies: Dependencies {
     let reminderService: ReminderService = PreviewReminderService()
     let schedulingService: SchedulingService = PreviewSchedulingService()
     let cleaningService: CleaningService = PreviewCleaningService()
+    let markCompleteUseCase: MarkCompleteUseCase = PreviewMarkCompleteUseCase()
 }
