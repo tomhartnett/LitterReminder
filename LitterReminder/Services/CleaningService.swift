@@ -58,7 +58,7 @@ final class DefaultCleaningService: CleaningService {
 
         try repository.addCleaning(cleaning)
 
-        return cleaning.identifier.uuidString
+        return cleaning.identifier
     }
     
     func markComplete(_ cleaning: Cleaning, currentDate: Date) throws {

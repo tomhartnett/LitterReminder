@@ -18,7 +18,7 @@ enum CleaningSchemaV2: VersionedSchema {
     @Model
     class Cleaning {
         @Attribute(.unique)
-        var identifier: UUID
+        var identifier: String
 
         var createdDate: Date
 
@@ -35,7 +35,7 @@ enum CleaningSchemaV2: VersionedSchema {
         }
 
         init(
-            identifier: UUID = UUID(),
+            identifier: String = UUID().uuidString,
             createdDate: Date,
             scheduledDate: Date,
             completedDate: Date? = nil,
