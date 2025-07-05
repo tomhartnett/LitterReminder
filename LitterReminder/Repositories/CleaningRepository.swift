@@ -34,8 +34,9 @@ final class DefaultCleaningRepository: CleaningRepository {
     }
     
     func addCleaning(_ cleaning: Cleaning) throws {
-        modelContext.insert(cleaning)
-        try modelContext.save()
+        let executor = DefaultSerialModelExecutor(modelContext: modelContext)
+        executor.modelContext.insert(cleaning)
+        try executor.modelContext.save()
     }
     
     func updateCleaning(_ cleaning: Cleaning) throws {

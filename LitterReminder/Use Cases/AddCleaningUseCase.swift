@@ -8,7 +8,7 @@
 import Foundation
 
 protocol AddCleaningUseCase {
-    func execute(currentDate: Date, scheduledDate: Date) async throws
+    func execute(currentDate: Date) async throws
 }
 
 final class DefaultAddCleaningUseCase: AddCleaningUseCase {
@@ -29,13 +29,20 @@ final class DefaultAddCleaningUseCase: AddCleaningUseCase {
         self.schedulingService = schedulingService
     }
 
-    func execute(currentDate: Date, scheduledDate: Date) async throws {
-        // TODO: pass cleaningID to notificationService and save it on the notification
-        let cleaningID = try cleaningService.addCleaning(
+    func execute(currentDate: Date) async throws {
+        let scheduledDate = schedulingService.nextCleaningDate()
+        let reminderID = try? reminderService.addReminder(scheduledDate)
+        let notificationID = try? await notificationService.scheduleNotification(scheduledDate)
+
+        try cleaningService.addCleaning(
             currentDate: currentDate,
             scheduledDate: scheduledDate,
-            notificationID: nil,
-            reminderID: nil
+            notificationID: notificationID,
+            reminderID: reminderID
         )
     }
+}
+
+final class PreviewAddCleaningUseCase: AddCleaningUseCase {
+    func execute(currentDate: Date) async throws {}
 }

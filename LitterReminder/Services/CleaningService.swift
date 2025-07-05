@@ -5,6 +5,7 @@ protocol CleaningService {
 
     func getCompletedCleanings() throws -> [Cleaning]
 
+    @discardableResult
     func addCleaning(
         currentDate: Date,
         scheduledDate: Date,
@@ -42,7 +43,8 @@ final class DefaultCleaningService: CleaningService {
         return cleanings.filter { $0.isComplete }
             .sorted { ($0.completedDate ?? .distantPast) > ($1.completedDate ?? .distantPast) }
     }
-    
+
+    @discardableResult
     func addCleaning(
         currentDate: Date,
         scheduledDate: Date,
@@ -56,9 +58,11 @@ final class DefaultCleaningService: CleaningService {
             reminderID: reminderID
         )
 
+        let identifier = cleaning.identifier
+
         try repository.addCleaning(cleaning)
 
-        return cleaning.identifier
+        return identifier
     }
     
     func markComplete(_ cleaning: Cleaning, currentDate: Date) throws {

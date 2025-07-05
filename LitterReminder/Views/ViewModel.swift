@@ -55,27 +55,12 @@ import SwiftUI
     }
 
     func addCleaning(_ currentDate: Date = .now) {
-        let scheduledDate = dependencies.schedulingService.nextCleaningDate()
-
-        // TODO: handle error
-        let reminderID = try? dependencies.reminderService.addReminder(scheduledDate)
-
         Task {
-            // TODO: handle error
-            let notificationID = try? await dependencies.notificationService.scheduleNotification(scheduledDate)
-
-            await MainActor.run {
-                do {
-                    try dependencies.cleaningService.addCleaning(
-                        currentDate: currentDate,
-                        scheduledDate: scheduledDate,
-                        notificationID: notificationID,
-                        reminderID: reminderID
-                    )
-                    fetchData()
-                } catch {
-                    // TODO: handle error
-                }
+            do {
+                try await dependencies.addCleaningUseCase.execute(currentDate: currentDate)
+                fetchData()
+            } catch {
+                // TODO: handle error
             }
         }
     }
