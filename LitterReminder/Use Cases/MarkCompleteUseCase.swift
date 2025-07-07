@@ -1,7 +1,7 @@
 import Foundation
 
 protocol MarkCompleteUseCase {
-    func execute(for cleaning: Cleaning, currentDate: Date) async throws
+    func execute(for cleaning: Cleaning, completedDate: Date) async throws
 }
 
 final class DefaultMarkCompleteUseCase: MarkCompleteUseCase {
@@ -22,30 +22,27 @@ final class DefaultMarkCompleteUseCase: MarkCompleteUseCase {
         self.schedulingService = schedulingService
     }
 
-    func execute(for cleaning: Cleaning, currentDate: Date) async throws {
+    func execute(for cleaning: Cleaning, completedDate: Date) async throws {
         // Mark the current cleaning as complete
-        try cleaningService.markComplete(cleaning, currentDate: currentDate)
+        try cleaningService.markComplete(cleaning, completedDate: completedDate)
 
         // Complete the reminder if it exists
         if let reminderID = cleaning.reminderID {
-            try reminderService.completeReminder(reminderID, completionDate: currentDate)
+            try reminderService.completeReminder(reminderID, completionDate: completedDate)
         }
 
-        // Schedule the next cleaning
-        let nextScheduledDate = schedulingService.nextCleaningDate()
-        let newReminderID = try reminderService.addReminder(nextScheduledDate)
-        let newNotificationID = try await notificationService.scheduleNotification(nextScheduledDate)
+        let scheduledDate = schedulingService.nextCleaningDate(after: completedDate)
+        let notificationID = try await notificationService.scheduleNotification(scheduledDate)
+        let reminderID = try reminderService.addReminder(scheduledDate)
 
-        // TODO: pass cleaningID to notificationService and save it on the notification
-        let cleaningID = try cleaningService.addCleaning(
-            currentDate: currentDate,
-            scheduledDate: nextScheduledDate,
-            notificationID: newNotificationID,
-            reminderID: newReminderID
+        try cleaningService.addCleaning(
+            scheduledDate: scheduledDate,
+            notificationID: notificationID,
+            reminderID: reminderID
         )
     }
 }
 
 final class PreviewMarkCompleteUseCase: MarkCompleteUseCase {
-    func execute(for cleaning: Cleaning, currentDate: Date) async throws {}
+    func execute(for cleaning: Cleaning, completedDate: Date) async throws {}
 }

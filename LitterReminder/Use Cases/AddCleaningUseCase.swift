@@ -31,8 +31,8 @@ final class DefaultAddCleaningUseCase: AddCleaningUseCase {
 
     func execute(currentDate: Date) async throws {
         let scheduledDate = schedulingService.nextCleaningDate()
-        let reminderID = try? reminderService.addReminder(scheduledDate)
-        let notificationID = try? await notificationService.scheduleNotification(scheduledDate)
+        let notificationID = try await notificationService.scheduleNotification(scheduledDate)
+        let reminderID = try reminderService.addReminder(scheduledDate)
 
         try cleaningService.addCleaning(
             currentDate: currentDate,

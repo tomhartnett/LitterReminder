@@ -1,4 +1,5 @@
 import Foundation
+import SwiftData
 
 protocol CleaningService {
     func getScheduledCleaning() throws -> Cleaning?
@@ -13,33 +14,49 @@ protocol CleaningService {
         reminderID: String?
     ) throws -> String
 
-    func markComplete(_ cleaning: Cleaning, currentDate: Date) throws
+    func markComplete(_ cleaning: Cleaning, completedDate: Date) throws
 
     func deleteCleaning(_ cleaning: Cleaning) throws
 
-    func fetchAllCleanings(limit: Int?) throws -> [Cleaning]
-
-    func fetchCleaning(byNotificationID id: String) throws -> Cleaning?
+    func fetchAllCleanings() throws -> [Cleaning]
 
     func updateCleaning(_ cleaning: Cleaning) throws
 }
 
-final class DefaultCleaningService: CleaningService {
-    private let repository: CleaningRepository
-    
-    init(repository: CleaningRepository) {
-        self.repository = repository
+extension CleaningService {
+    @discardableResult
+    func addCleaning(
+        scheduledDate: Date,
+        notificationID: String?,
+        reminderID: String?
+    ) throws -> String {
+        return try addCleaning(
+            currentDate: .now,
+            scheduledDate: scheduledDate,
+            notificationID: notificationID,
+            reminderID: reminderID
+        )
     }
-    
+}
+
+final class DefaultCleaningService: CleaningService {
+    private let modelContext: ModelContext
+
+    init(modelContext: ModelContext) {
+        self.modelContext = modelContext
+    }
+
     func getScheduledCleaning() throws -> Cleaning? {
-        let cleanings = try repository.fetchCleanings(limit: nil)
+        let cleanings = try fetchAllCleanings()
+
         return cleanings.filter { !$0.isComplete }
             .sorted { $0.scheduledDate < $1.scheduledDate }
             .first
     }
     
     func getCompletedCleanings() throws -> [Cleaning] {
-        let cleanings = try repository.fetchCleanings(limit: nil)
+        let cleanings = try fetchAllCleanings()
+
         return cleanings.filter { $0.isComplete }
             .sorted { ($0.completedDate ?? .distantPast) > ($1.completedDate ?? .distantPast) }
     }
@@ -60,30 +77,34 @@ final class DefaultCleaningService: CleaningService {
 
         let identifier = cleaning.identifier
 
-        try repository.addCleaning(cleaning)
+        let executor = DefaultSerialModelExecutor(modelContext: modelContext)
+        executor.modelContext.insert(cleaning)
+        try executor.modelContext.save()
 
         return identifier
     }
     
-    func markComplete(_ cleaning: Cleaning, currentDate: Date) throws {
-        cleaning.completedDate = currentDate
-        try repository.updateCleaning(cleaning)
+    func markComplete(_ cleaning: Cleaning, completedDate: Date) throws {
+        cleaning.completedDate = completedDate
+        try modelContext.save()
     }
     
     func deleteCleaning(_ cleaning: Cleaning) throws {
-        try repository.deleteCleaning(cleaning)
+        modelContext.delete(cleaning)
+        try modelContext.save()
     }
     
-    func fetchAllCleanings(limit: Int? = nil) throws -> [Cleaning] {
-        try repository.fetchCleanings(limit: limit)
-    }
-    
-    func fetchCleaning(byNotificationID id: String) throws -> Cleaning? {
-        try repository.fetchCleaning(byNotificationID: id)
+    func fetchAllCleanings() throws -> [Cleaning] {
+        var descriptor = FetchDescriptor<Cleaning>(
+            sortBy: [SortDescriptor(\.createdDate, order: .reverse)]
+        )
+        descriptor.fetchLimit = 20
+
+        return try modelContext.fetch(descriptor)
     }
 
     func updateCleaning(_ cleaning: Cleaning) throws {
-        try repository.updateCleaning(cleaning)
+        try modelContext.save()
     }
 }
 
@@ -111,16 +132,12 @@ final class PreviewCleaningService: CleaningService {
         return UUID().uuidString
     }
 
-    func markComplete(_ cleaning: Cleaning, currentDate: Date) throws {}
-    
+    func markComplete(_ cleaning: Cleaning, completedDate: Date) throws {}
+
     func deleteCleaning(_ cleaning: Cleaning) throws {}
     
-    func fetchAllCleanings(limit: Int?) throws -> [Cleaning] {
+    func fetchAllCleanings() throws -> [Cleaning] {
         return []
-    }
-    
-    func fetchCleaning(byNotificationID id: String) throws -> Cleaning? {
-        return nil
     }
 
     func updateCleaning(_ cleaning: Cleaning) throws {}

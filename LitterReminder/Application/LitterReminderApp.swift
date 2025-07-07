@@ -38,10 +38,8 @@ struct LitterReminderApp: App {
                 migrationPlan: CleaningMigrationPlan.self
             )
 
-            let cleaningRepository = DefaultCleaningRepository(modelContext: container.mainContext)
-
             dependencies = AppDependencies(
-                cleaningService: DefaultCleaningService(repository: cleaningRepository),
+                cleaningService: DefaultCleaningService(modelContext: container.mainContext),
                 notificationService: DefaultNotificationService(),
                 reminderService: DefaultReminderService(),
                 schedulingService: DefaultSchedulingService()

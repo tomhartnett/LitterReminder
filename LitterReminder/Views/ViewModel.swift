@@ -85,7 +85,7 @@ import SwiftUI
 
     func fetchData() {
         do {
-            cleanings = try dependencies.cleaningService.fetchAllCleanings(limit: 20)
+            cleanings = try dependencies.cleaningService.fetchAllCleanings()
         } catch {
             // TODO: handle error
         }
@@ -96,16 +96,13 @@ import SwiftUI
             return
         }
 
-        if let reminderID = scheduledCleaning.reminderID {
-            // TODO: handle error
-            try? dependencies.reminderService.completeReminder(reminderID, completionDate: currentDate)
-        }
-
-        do {
-            try dependencies.cleaningService.markComplete(scheduledCleaning, currentDate: currentDate)
-            fetchData()
-        } catch {
-            // TODO: handle error
+        Task {
+            do {
+                try await dependencies.markCompleteUseCase.execute(for: scheduledCleaning, completedDate: currentDate)
+                fetchData()
+            } catch {
+                // TODO: handle error
+            }
         }
     }
 

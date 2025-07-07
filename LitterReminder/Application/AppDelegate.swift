@@ -49,11 +49,15 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
                     occurrence: occurrence + 1
                 )
 
-                if let cleaning = try cleaningService.fetchCleaning(byNotificationID: existingNotificationID) {
+                if let cleaning = try cleaningService.fetchAllCleanings().first(where: {
+                    $0.notificationID == existingNotificationID
+                }) {
                     cleaning.notificationID = newNotificationID
+
                     if let reminderID = cleaning.reminderID {
                         try dependencies?.reminderService.rescheduleReminder(reminderID, dueDate: newDueDate)
                     }
+
                     try cleaningService.updateCleaning(cleaning)
                 }
             } catch {

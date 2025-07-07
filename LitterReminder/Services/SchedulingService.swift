@@ -29,6 +29,10 @@ extension SchedulingService {
         nextCleaningDate(.now, calendar: .current)
     }
 
+    func nextCleaningDate(after date: Date) -> Date {
+        nextCleaningDate(date, calendar: .current)
+    }
+
     func nextCleaningDateComponents() -> DateComponents {
         nextCleaningDateComponents(.now, calendar: .current)
     }

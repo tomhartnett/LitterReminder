@@ -39,7 +39,6 @@ struct HomeView: View {
         .sheet(isPresented: $showConfirmMarkComplete) {
             ConfirmView(confirmAction: { completedDate in
                 withAnimation {
-                    viewModel.addCleaning(completedDate)
                     viewModel.markComplete(completedDate)
                 }
             })
