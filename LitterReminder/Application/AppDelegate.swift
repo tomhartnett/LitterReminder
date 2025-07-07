@@ -28,43 +28,57 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
     func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse) async {
         let content = response.notification.request.content
         guard content.categoryIdentifier == NotificationConstants.categoryIdentifier else {
+            // TODO: log error
+            return
+        }
+
+        guard let scheduleService = dependencies?.schedulingService,
+              let notificationService = dependencies?.notificationService,
+              let cleaningService = dependencies?.cleaningService else {
+            // TODO: log error
+            return
+        }
+
+        let existingNotificationID = response.notification.request.identifier
+
+        guard let cleaning = try? cleaningService.fetchAllCleanings().first(where: {
+            $0.notificationID == existingNotificationID
+        }) else {
+            // TODO: log error
             return
         }
 
         switch response.actionIdentifier {
+        case NotificationConstants.markCompleteAction:
+            do {
+                try await dependencies?.markCompleteUseCase.execute(for: cleaning, completedDate: .now)
+            } catch {
+                // TODO: handle error
+            }
+
         case NotificationConstants.reminderLaterAction:
-            guard let scheduleService = dependencies?.schedulingService,
-                  let notificationService = dependencies?.notificationService,
-                  let cleaningService = dependencies?.cleaningService,
-                  let existingDueDate = content.userInfo[NotificationConstants.userInfoDueDate] as? Date,
+            guard let existingDueDate = content.userInfo[NotificationConstants.userInfoDueDate] as? Date,
                   let occurrence = content.userInfo[NotificationConstants.userInfoOccurrence] as? Int else {
+                // TODO: log error
                 break
             }
 
             do {
-                let existingNotificationID = response.notification.request.identifier
                 let newDueDate = scheduleService.snoozeCleaningDate(existingDueDate)
                 let newNotificationID = try await notificationService.scheduleNotification(
                     newDueDate,
                     occurrence: occurrence + 1
                 )
 
-                if let cleaning = try cleaningService.fetchAllCleanings().first(where: {
-                    $0.notificationID == existingNotificationID
-                }) {
-                    cleaning.notificationID = newNotificationID
+                cleaning.notificationID = newNotificationID
 
-                    if let reminderID = cleaning.reminderID {
-                        try dependencies?.reminderService.rescheduleReminder(reminderID, dueDate: newDueDate)
-                    }
-
-                    try cleaningService.updateCleaning(cleaning)
-                }
+                try cleaningService.updateCleaning(cleaning)
             } catch {
                 // TODO: handle error
             }
 
         default:
+            // TODO: log error
             break
         }
     }

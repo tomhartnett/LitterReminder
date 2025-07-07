@@ -17,6 +17,7 @@ protocol NotificationService {
 
 enum NotificationConstants {
     static let categoryIdentifier = "SCHEDULED_CLEANING"
+    static let markCompleteAction = "MARK_COMPLETE"
     static let reminderLaterAction = "REMIND_LATER_1_DAY"
     static let userInfoDueDate = "DUE_DATE"
     static let userInfoOccurrence = "OCCURRENCE"
@@ -46,10 +47,11 @@ final class DefaultNotificationService: NotificationService {
     let center = UNUserNotificationCenter.current()
 
     func registerNotifications() {
+        let markCompleteAction = UNNotificationAction(identifier: NotificationConstants.markCompleteAction, title: "Mark Complete")
         let remindLaterAction = UNNotificationAction(identifier: NotificationConstants.reminderLaterAction, title: "Remind Me Tomorrow")
         let scheduledCleaningCategory = UNNotificationCategory(
             identifier: NotificationConstants.categoryIdentifier,
-            actions: [remindLaterAction],
+            actions: [markCompleteAction, remindLaterAction],
             intentIdentifiers: [],
             hiddenPreviewsBodyPlaceholder: "",
             options: .customDismissAction

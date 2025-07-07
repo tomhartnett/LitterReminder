@@ -13,7 +13,6 @@ protocol ReminderService {
     func completeReminder(_ identifier: String, completionDate: Date) throws
     func deleteReminder(_ identifier: String) throws
     func requestRemindersAccess()
-    func rescheduleReminder(_ identifier: String, dueDate: Date) throws
 }
 
 enum ReminderServiceError: Error, LocalizedError {
@@ -107,20 +106,6 @@ final class DefaultReminderService: ReminderService {
             break
         }
     }
-
-    func rescheduleReminder(_ identifier: String, dueDate: Date) throws {
-        guard let reminder = eventStore.calendarItem(withIdentifier: identifier) as? EKReminder else {
-            return
-        }
-
-        reminder.dueDateComponents = dueDate.dueDateComponents()
-
-        do {
-            try eventStore.save(reminder, commit: true)
-        } catch {
-            throw ReminderServiceError.failedToSave(error)
-        }
-    }
 }
 
 final class PreviewReminderService: ReminderService {
@@ -133,6 +118,4 @@ final class PreviewReminderService: ReminderService {
     func deleteReminder(_ identifier: String) throws {}
 
     func requestRemindersAccess() {}
-
-    func rescheduleReminder(_ identifier: String, dueDate: Date) throws {}
 }
