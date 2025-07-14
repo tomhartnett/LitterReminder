@@ -31,6 +31,10 @@ final class DefaultMarkCompleteUseCase: MarkCompleteUseCase {
             try reminderService.completeReminder(reminderID, completionDate: completedDate)
         }
 
+        if let notificationID = cleaning.notificationID {
+            notificationService.deleteNotification(notificationID)
+        }
+
         let scheduledDate = schedulingService.nextCleaningDate(after: completedDate)
         let notificationID = try await notificationService.scheduleNotification(scheduledDate)
         let reminderID = try reminderService.addReminder(scheduledDate)
