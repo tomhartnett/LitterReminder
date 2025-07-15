@@ -66,21 +66,8 @@ import SwiftUI
     }
 
     func delete(_ cleaning: Cleaning) {
-        if let reminderID = cleaning.reminderID {
-            // TODO: handle error
-            try? dependencies.reminderService.deleteReminder(reminderID)
-        }
-
-        if let notificationID = cleaning.notificationID {
-            dependencies.notificationService.deleteNotification(notificationID)
-        }
-
-        do {
-            try dependencies.cleaningService.deleteCleaning(cleaning)
-            fetchData()
-        } catch {
-            // TODO: handle error
-        }
+        dependencies.deleteUseCase.execute(cleaning)
+        fetchData()
     }
 
     func fetchData() {
