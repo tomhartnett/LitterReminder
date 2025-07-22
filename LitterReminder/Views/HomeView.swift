@@ -14,10 +14,24 @@ struct HomeView: View {
 
     var body: some View {
         VStack {
-            if viewModel.hasScheduledCleaning || viewModel.hasCompletedCleanings {
-                listView
-            } else {
-                noDataView
+            HistoryChartView(model: .init(Array(viewModel.cleanings.prefix(7))))
+                .padding()
+
+            if let cleaning = viewModel.scheduledCleaning {
+                CleaningView(
+                    model: .init(
+                        currentDate: viewModel.currentDate,
+                        scheduledDate: cleaning.scheduledDate,
+                        completedDate: cleaning.completedDate
+                    )
+                )
+                .swipeActions(edge: .trailing) {
+                    Button(role: .destructive) {
+                        viewModel.delete(cleaning)
+                    } label: {
+                        Label("Delete", systemImage: "trash")
+                    }
+                }
             }
 
             actionButton
@@ -101,22 +115,7 @@ struct HomeView: View {
                 }
             }
 
-            if let cleaning = viewModel.scheduledCleaning {
-                CleaningView(
-                    model: .init(
-                        currentDate: viewModel.currentDate,
-                        scheduledDate: cleaning.scheduledDate,
-                        completedDate: cleaning.completedDate
-                    )
-                )
-                .swipeActions(edge: .trailing) {
-                    Button(role: .destructive) {
-                        viewModel.delete(cleaning)
-                    } label: {
-                        Label("Delete", systemImage: "trash")
-                    }
-                }
-            }
+
         }
         .listStyle(PlainListStyle())
     }

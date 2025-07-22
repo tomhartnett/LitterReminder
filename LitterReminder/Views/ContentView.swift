@@ -24,6 +24,10 @@ struct ContentView: View {
                 HistoryView()
                     .environment(viewModel)
             }
+
+            Tab("Settings", systemImage: "gearshape") {
+                Text("Settings")
+            }
         }
     }
 }
