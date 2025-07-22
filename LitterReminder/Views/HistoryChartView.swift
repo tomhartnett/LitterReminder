@@ -25,24 +25,13 @@ struct HistoryChartView: View {
             ForEach(model.points) { point in
                 PointMark(
                     x: .value("Date", point.date, unit: .day),
-                    y: .value("Time", point.secondsSinceMidnight)
+                    y: .value("Time", 1)
                 )
                 .foregroundStyle(pointColor(point))
             }
         }
-        .chartYAxis {
-            AxisMarks(values: model.yAxisValues) { value in
-                if let double = value.as(Double.self) {
-                    AxisValueLabel {
-                        let today = Calendar.current.startOfDay(for: Date())
-                        let yValue = today.addingTimeInterval(double)
-                        Text(yValue, format: .dateTime.hour())
-                    }
-                }
-            }
-        }
-        .chartYScale(domain: [model.yAxisMin, model.yAxisMax])
-
+        .chartYAxis(.hidden)
+        .chartYScale(domain: [0, 2])
     }
 
     func pointColor(_ point: CleaningPoint) -> Color {
@@ -106,23 +95,23 @@ extension Date {
     }
 }
 
-#Playground {
-    let point1 = CleaningPoint(
-        Cleaning(
-            createdDate: Date().addingTimeInterval(-25_000),
-            scheduledDate: Date().addingTimeInterval(45_000),
-            completedDate: Date().addingTimeInterval(35_000)
-        )
-    )
-
-    let point2 = CleaningPoint(
-        Cleaning(
-            createdDate: Date().addingTimeInterval(-45_000),
-            scheduledDate: Date().addingTimeInterval(45_000),
-            completedDate: nil
-        )
-    )
-}
+//#Playground {
+//    let point1 = CleaningPoint(
+//        Cleaning(
+//            createdDate: Date().addingTimeInterval(-25_000),
+//            scheduledDate: Date().addingTimeInterval(45_000),
+//            completedDate: Date().addingTimeInterval(35_000)
+//        )
+//    )
+//
+//    let point2 = CleaningPoint(
+//        Cleaning(
+//            createdDate: Date().addingTimeInterval(-45_000),
+//            scheduledDate: Date().addingTimeInterval(45_000),
+//            completedDate: nil
+//        )
+//    )
+//}
 
 #Preview {
     HistoryChartView(

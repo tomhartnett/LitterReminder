@@ -25,6 +25,10 @@ import SwiftUI
         })
     }
 
+    var reversedCleanings: [Cleaning] {
+        cleanings.sorted(by: { $0.createdDate < $1.createdDate })
+    }
+
     var hasCompletedCleanings: Bool {
         !completedCleanings.isEmpty
     }
