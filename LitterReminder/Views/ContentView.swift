@@ -20,11 +20,6 @@ struct ContentView: View {
                     .environment(viewModel)
             }
 
-            Tab("History", systemImage: "calendar") {
-                HistoryView()
-                    .environment(viewModel)
-            }
-
             Tab("Settings", systemImage: "gearshape") {
                 Text("Settings")
             }

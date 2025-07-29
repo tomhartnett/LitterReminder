@@ -30,6 +30,22 @@ struct HistoryChartView: View {
                 .foregroundStyle(pointColor(point))
             }
         }
+        .chartXAxis {
+            AxisMarks(values: .stride(by: .day)) { value in
+                AxisGridLine()
+                AxisTick()
+                AxisValueLabel {
+                    if let date = value.as(Date.self) {
+                        VStack {
+                            Text(date.formatted(.dateTime.weekday(.narrow)))
+                            Text(date.formatted(.dateTime.day(.defaultDigits)))
+                        }
+                        .fontWeight(Calendar.current.isDateInToday(date) ? .bold : .regular)
+                        .foregroundStyle(Calendar.current.isDateInToday(date) ? .red : .secondary)
+                    }
+                }
+            }
+        }
         .chartYAxis(.hidden)
         .chartYScale(domain: [0, 2])
     }
@@ -62,8 +78,10 @@ extension HistoryChartView {
             self.yAxisMax = yAxisMax
         }
 
-        init(_ cleanings: [Cleaning]) {
-            let points = cleanings.map({ CleaningPoint($0) })
+        init(_ cleanings: [Cleaning], currentDate: Date, daysBack: Int = 14) {
+            let points = cleanings.filter({
+                currentDate.timeIntervalSince($0.createdDate) <= 86_000 * TimeInterval(daysBack)
+            }).map({ CleaningPoint($0) })
             let sortedPoints = points.sorted(by: { $0.secondsSinceMidnight < $1.secondsSinceMidnight })
 
             self.points = points

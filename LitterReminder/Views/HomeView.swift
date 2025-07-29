@@ -14,7 +14,7 @@ struct HomeView: View {
 
     var body: some View {
         VStack {
-            HistoryChartView(model: .init(Array(viewModel.cleanings)))
+            HistoryChartView(model: .init(viewModel.cleanings, currentDate: viewModel.currentDate))
                 .frame(height: 50)
                 .padding()
 
@@ -31,13 +31,20 @@ struct HomeView: View {
                             )
                         )
                         .id(index)
+                        .swipeActions(edge: .trailing) {
+                            Button(role: .destructive) {
+                                viewModel.delete(item)
+                            } label: {
+                                Label("Delete", systemImage: "trash")
+                            }
+                        }
                     }
                 }
                 .onAppear {
                     // Scroll to bottom when view appears
                     scrollToBottom(proxy: proxy)
                 }
-                .onChange(of: viewModel.cleanings.count) { _, _ in
+                .onChange(of: viewModel.reversedCleanings.count) { _, _ in
                     // Scroll to bottom when new items are added
                     scrollToBottom(proxy: proxy)
                 }
@@ -79,7 +86,7 @@ struct HomeView: View {
     }
 
     private func scrollToBottom(proxy: ScrollViewProxy) {
-        let count = viewModel.cleanings.count
+        let count = viewModel.reversedCleanings.count
         if count > 0 {
             withAnimation(.easeOut(duration: 0.3)) {
                 proxy.scrollTo(count - 1, anchor: .bottom)
