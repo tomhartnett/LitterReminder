@@ -49,9 +49,5 @@ enum CleaningSchemaV2: VersionedSchema {
             self.notificationID = notificationID
             self.reminderID = reminderID
         }
-
-        func isOverdue(_ currentDate: Date = Date()) -> Bool {
-            !isComplete && scheduledDate < currentDate
-        }
     }
 }
