@@ -16,18 +16,19 @@ struct HomeView: View {
         VStack {
             HistoryChartView(model: .init(viewModel.cleanings, currentDate: viewModel.currentDate))
                 .frame(height: 50)
-                .padding()
+                .padding(.horizontal)
+
+            Divider()
 
             ScrollViewReader { proxy in
                 List {
-                    ForEach(Array(viewModel.reversedCleanings.enumerated()), id: \.element.identifier) {
-                        index,
-                        item in
+                    ForEach(Array(viewModel.reversedCleanings.enumerated()), id: \.element.identifier) { index, item in
                         CleaningView(
                             model: .init(
                                 currentDate: viewModel.currentDate,
                                 scheduledDate: item.scheduledDate,
-                                completedDate: item.completedDate
+                                completedDate: item.completedDate,
+                                showDivider: index != viewModel.reversedCleanings.count - 1
                             )
                         )
                         .id(index)
@@ -38,20 +39,25 @@ struct HomeView: View {
                                 Label("Delete", systemImage: "trash")
                             }
                         }
+                        .listRowSeparator(
+                            // Possibly a iOS 26 beta bug. Last item shows a separator beneath it.
+                            // Hiding this and implementing custom divider instead (`showDivider` above).
+                            .hidden
+                        )
                     }
                 }
                 .onAppear {
-                    // Scroll to bottom when view appears
                     scrollToBottom(proxy: proxy)
                 }
                 .onChange(of: viewModel.reversedCleanings.count) { _, _ in
-                    // Scroll to bottom when new items are added
                     scrollToBottom(proxy: proxy)
                 }
             }
 
+            Divider()
+
             actionButton
-                .padding(.bottom)
+                .padding(.vertical)
         }
         .listStyle(.plain)
         .padding(.top)
@@ -114,22 +120,6 @@ struct HomeView: View {
                 Text("Mark Complete")
             }
             .buttonStyle(PrimaryButtonStyle())
-        }
-    }
-
-    @ViewBuilder
-    private var noDataView: some View {
-        VStack {
-            Spacer()
-
-            Text("No data")
-                .font(.title)
-                .foregroundStyle(.secondary)
-
-            Text("Tap \"Schedule Cleaning\" to get started")
-                .foregroundStyle(.secondary)
-
-            Spacer()
         }
     }
 }

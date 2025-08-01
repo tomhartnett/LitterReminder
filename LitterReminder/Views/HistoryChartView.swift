@@ -34,6 +34,7 @@ struct HistoryChartView: View {
                 AxisTick()
                 AxisValueLabel(centered: true) {
                     if let date = value.as(Date.self) {
+                        // TODO: how to handle very large text sizes without truncating.
                         VStack {
                             Text(date.formatted(.dateTime.weekday(.narrow)))
                             Text(date.formatted(.dateTime.day(.defaultDigits)))
