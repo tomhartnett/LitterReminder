@@ -14,17 +14,8 @@ struct ContentView: View {
     @State private var sheetContentHeight = CGFloat(0)
 
     var body: some View {
-        TabView {
-            Tab("Home", systemImage: "house") {
-                HomeView()
-                    .environment(viewModel)
-            }
-
-            Tab("History", systemImage: "calendar") {
-                HistoryView()
-                    .environment(viewModel)
-            }
-        }
+        HomeView()
+            .environment(viewModel)
     }
 }
 

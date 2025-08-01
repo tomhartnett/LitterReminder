@@ -18,27 +18,34 @@ struct CleaningView: View {
     var model: Model
 
     var body: some View {
-        HStack(spacing: 24) {
-            Image(systemName: model.imageSystemName)
-                .font(.largeTitle)
-                .foregroundStyle(Color(uiColor: model.badgeColor), .primary)
+        VStack(alignment: .leading) {
+            HStack(alignment: .center, spacing: 24) {
+                Image(systemName: model.imageSystemName)
+                    .font(.largeTitle)
+                    .foregroundStyle(Color(uiColor: model.badgeColor), .primary)
 
-            VStack(alignment: .leading) {
-                Text(model.title)
-                    .font(.title)
+                VStack(alignment: .leading) {
+                    Text(model.title)
+                        .font(.title2)
 
-                Text(model.subtitle1)
-                    .foregroundStyle(.secondary)
+                    if let subtitle2 = model.subtitle2 {
+                        Text(subtitle2)
+                            .foregroundStyle(.secondary)
+                            .font(.headline)
+                    }
 
-                if let subtitle2 = model.subtitle2 {
-                    Text(subtitle2)
+                    Text(model.subtitle1)
                         .foregroundStyle(.secondary)
                 }
             }
+            .padding(.horizontal)
 
-            Spacer()
+            if model.showDivider {
+                Divider()
+                    .padding(.leading)
+                    .padding(.top)
+            }
         }
-        .padding()
     }
 }
 
@@ -49,32 +56,37 @@ extension CleaningView {
         let title: String
         let subtitle1: String
         let subtitle2: String?
+        let showDivider: Bool
 
         init(
             imageSystemName: String,
             badgeColor: UIColor,
             title: String,
             subtitle1: String,
-            subtitle2: String? = nil
+            subtitle2: String? = nil,
+            showDivider: Bool = true
         ) {
             self.imageSystemName = imageSystemName
             self.badgeColor = badgeColor
             self.title = title
             self.subtitle1 = subtitle1
             self.subtitle2 = subtitle2
+            self.showDivider = showDivider
         }
 
         init(
             currentDate: Date,
             scheduledDate: Date,
-            completedDate: Date?
+            completedDate: Date?,
+            showDivider: Bool = true
         ) {
             if let completedDate {
                 self.init(
                     imageSystemName: "clock.badge.checkmark",
                     badgeColor: .systemGreen,
                     title: completedDate.formattedString(),
-                    subtitle1: completedDate.relativeFormattedString()
+                    subtitle1: completedDate.relativeFormattedString(),
+                    showDivider: showDivider
                 )
             } else if currentDate < scheduledDate {
                 self.init(
@@ -82,7 +94,8 @@ extension CleaningView {
                     badgeColor: .label,
                     title: "Cleaning scheduled",
                     subtitle1: scheduledDate.formattedString(),
-                    subtitle2: scheduledDate.relativeFormattedString()
+                    subtitle2: scheduledDate.relativeFormattedString(),
+                    showDivider: showDivider
                 )
             } else {
                 let elapsedTime = currentDate.timeIntervalSince(scheduledDate)
@@ -92,7 +105,8 @@ extension CleaningView {
                         badgeColor: .systemOrange,
                         title: "Cleaning is due",
                         subtitle1: scheduledDate.formattedString(),
-                        subtitle2: scheduledDate.relativeFormattedString()
+                        subtitle2: scheduledDate.relativeFormattedString(),
+                        showDivider: showDivider
                     )
                 } else {
                     self.init(
@@ -100,7 +114,8 @@ extension CleaningView {
                         badgeColor: .systemRed,
                         title: "Cleaning is overdue",
                         subtitle1: scheduledDate.formattedString(),
-                        subtitle2: scheduledDate.relativeFormattedString()
+                        subtitle2: scheduledDate.relativeFormattedString(),
+                        showDivider: showDivider
                     )
                 }
             }

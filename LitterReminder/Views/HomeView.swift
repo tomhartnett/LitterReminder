@@ -14,15 +14,52 @@ struct HomeView: View {
 
     var body: some View {
         VStack {
-            if viewModel.hasScheduledCleaning || viewModel.hasCompletedCleanings {
-                listView
-            } else {
-                noDataView
+            HistoryChartView(model: .init(viewModel.cleanings, currentDate: viewModel.currentDate))
+                .frame(height: 50)
+                .padding(.horizontal)
+
+            Divider()
+
+            ScrollViewReader { proxy in
+                List {
+                    ForEach(Array(viewModel.reversedCleanings.enumerated()), id: \.element.identifier) { index, item in
+                        CleaningView(
+                            model: .init(
+                                currentDate: viewModel.currentDate,
+                                scheduledDate: item.scheduledDate,
+                                completedDate: item.completedDate,
+                                showDivider: index != viewModel.reversedCleanings.count - 1
+                            )
+                        )
+                        .id(index)
+                        .swipeActions(edge: .trailing) {
+                            Button(role: .destructive) {
+                                viewModel.delete(item)
+                            } label: {
+                                Label("Delete", systemImage: "trash")
+                            }
+                        }
+                        .listRowSeparator(
+                            // Possibly a iOS 26 beta bug. Last item shows a separator beneath it.
+                            // Hiding this and implementing custom divider instead (`showDivider` above).
+                            .hidden
+                        )
+                    }
+                }
+                .onAppear {
+                    scrollToBottom(proxy: proxy)
+                }
+                .onChange(of: viewModel.reversedCleanings.count) { _, _ in
+                    scrollToBottom(proxy: proxy)
+                }
             }
 
+            Divider()
+
             actionButton
-                .padding(.bottom)
+                .padding(.vertical)
         }
+        .listStyle(.plain)
         .padding(.top)
         .navigationTitle("Litter Reminder")
         .alert("Error", isPresented: .constant(viewModel.errorMessage != nil), actions: {
@@ -54,6 +91,15 @@ struct HomeView: View {
         }
     }
 
+    private func scrollToBottom(proxy: ScrollViewProxy) {
+        let count = viewModel.reversedCleanings.count
+        if count > 0 {
+            withAnimation(.easeOut(duration: 0.3)) {
+                proxy.scrollTo(count - 1, anchor: .bottom)
+            }
+        }
+    }
+
     @ViewBuilder
     private var actionButton: some View {
         if !viewModel.hasScheduledCleaning {
@@ -74,66 +120,6 @@ struct HomeView: View {
                 Text("Mark Complete")
             }
             .buttonStyle(PrimaryButtonStyle())
-        }
-    }
-
-    @ViewBuilder
-    private var listView: some View {
-        List {
-            if let lastCleaning = viewModel.completedCleanings.first,
-               let completedDate = lastCleaning.completedDate {
-
-                CleaningView(
-                    model: .init(
-                        imageSystemName: "clock.badge.checkmark",
-                        badgeColor: .systemGreen,
-                        title: "Last cleaning",
-                        subtitle1: completedDate.formattedString(),
-                        subtitle2: completedDate.relativeFormattedString()
-                    )
-                )
-                .swipeActions(edge: .trailing) {
-                    Button(role: .destructive) {
-                        viewModel.delete(lastCleaning)
-                    } label: {
-                        Label("Delete", systemImage: "trash")
-                    }
-                }
-            }
-
-            if let cleaning = viewModel.scheduledCleaning {
-                CleaningView(
-                    model: .init(
-                        currentDate: viewModel.currentDate,
-                        scheduledDate: cleaning.scheduledDate,
-                        completedDate: cleaning.completedDate
-                    )
-                )
-                .swipeActions(edge: .trailing) {
-                    Button(role: .destructive) {
-                        viewModel.delete(cleaning)
-                    } label: {
-                        Label("Delete", systemImage: "trash")
-                    }
-                }
-            }
-        }
-        .listStyle(PlainListStyle())
-    }
-
-    @ViewBuilder
-    private var noDataView: some View {
-        VStack {
-            Spacer()
-
-            Text("No data")
-                .font(.title)
-                .foregroundStyle(.secondary)
-
-            Text("Tap \"Schedule Cleaning\" to get started")
-                .foregroundStyle(.secondary)
-
-            Spacer()
         }
     }
 }

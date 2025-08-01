@@ -14,7 +14,7 @@ import SwiftUI
 
     var errorMessage: String?
 
-    private var cleanings = [Cleaning]()
+    var cleanings = [Cleaning]()
 
     var completedCleanings: [Cleaning] {
         cleanings.filter({ $0.isComplete }).sorted(by: {
@@ -23,6 +23,10 @@ import SwiftUI
 
             return completed1 > completed2
         })
+    }
+
+    var reversedCleanings: [Cleaning] {
+        cleanings.sorted(by: { $0.createdDate < $1.createdDate })
     }
 
     var hasCompletedCleanings: Bool {
