@@ -78,7 +78,10 @@ extension HistoryChartView {
             )
 
             self.points = cleanings
-                .filter({ $0.scheduledDate >= startDate })
+                .filter({
+                    let date = $0.completedDate ?? $0.scheduledDate
+                    return date >= startDate
+                })
                 .map({ CleaningPoint($0, currentDate: currentDate) })
 
             self.startDate = startDate
