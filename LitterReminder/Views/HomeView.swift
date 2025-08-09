@@ -7,9 +7,19 @@
 
 import SwiftUI
 
+enum HomeViewSheet: Identifiable {
+    case confirmMarkComplete
+    case settings
+
+    var id: Self {
+        self
+    }
+}
+
 struct HomeView: View {
+    @Environment(AppSettings.self) private var appSettings
     @Environment(ViewModel.self) private var viewModel
-    @State private var showConfirmMarkComplete = false
+    @State private var sheet: HomeViewSheet?
     @State private var sheetContentHeight = CGFloat(0)
 
     var body: some View {
@@ -53,11 +63,6 @@ struct HomeView: View {
                     scrollToBottom(proxy: proxy)
                 }
             }
-
-            Divider()
-
-            actionButton
-                .padding(.vertical)
         }
         .listStyle(.plain)
         .padding(.top)
@@ -73,21 +78,31 @@ struct HomeView: View {
                 Text("An unknown error has occurred.")
             }
         })
-        .sheet(isPresented: $showConfirmMarkComplete) {
-            ConfirmView(confirmAction: { completedDate in
-                withAnimation {
-                    viewModel.markComplete(completedDate)
-                }
-            })
-            .background {
-                GeometryReader { proxy in
-                    Color.clear
-                        .task {
-                            sheetContentHeight = proxy.size.height
-                        }
+        .sheet(item: $sheet) { item in
+            switch item {
+            case .confirmMarkComplete:
+                confirmSheet
+
+            case .settings:
+                settingsSheet
+            }
+        }
+        .toolbar {
+            ToolbarSpacer(.flexible, placement: .bottomBar)
+
+            ToolbarItem(placement: .bottomBar) {
+                actionButton
+            }
+
+            ToolbarSpacer(.flexible, placement: .bottomBar)
+
+            ToolbarItem(placement: .bottomBar) {
+                Button(action: {
+                    sheet = .settings
+                }) {
+                    Image(systemName: "gearshape")
                 }
             }
-            .presentationDetents([.height(sheetContentHeight)])
         }
     }
 
@@ -110,17 +125,57 @@ struct HomeView: View {
                     }
                 }
             }) {
-                Text("Schedule Cleaning")
+                HStack {
+                    Image(systemName: "calendar.badge.clock")
+                    Text("Schedule")
+                }
+                .padding()
             }
-            .buttonStyle(PrimaryButtonStyle())
+
         } else {
             Button(action: {
-                showConfirmMarkComplete.toggle()
+                sheet = .confirmMarkComplete
             }) {
-                Text("Mark Complete")
+                HStack {
+                    Image(systemName: "checkmark.square")
+                    Text("Mark Complete")
+                }
             }
-            .buttonStyle(PrimaryButtonStyle())
+
         }
+    }
+
+    @ViewBuilder
+    private var confirmSheet: some View {
+        ConfirmView(confirmAction: { completedDate in
+            withAnimation {
+                viewModel.markComplete(completedDate)
+            }
+        })
+        .background {
+            GeometryReader { proxy in
+                Color.clear
+                    .task {
+                        sheetContentHeight = proxy.size.height
+                    }
+            }
+        }
+        .presentationDetents([.height(sheetContentHeight)])
+    }
+
+    @ViewBuilder
+    private var settingsSheet: some View {
+        SettingsView(appSettings: appSettings)
+            .padding()
+            .background {
+                GeometryReader { proxy in
+                    Color.clear
+                        .task {
+                            sheetContentHeight = proxy.size.height
+                        }
+                }
+            }
+            .presentationDetents([.height(sheetContentHeight)])
     }
 }
 
@@ -131,4 +186,5 @@ struct HomeView: View {
                 dependencies: PreviewDependencies()
             )
         )
+        .environment(AppSettings())
 }

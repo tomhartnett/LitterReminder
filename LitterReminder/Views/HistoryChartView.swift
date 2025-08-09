@@ -73,6 +73,9 @@ extension HistoryChartView {
                 for: currentDate.addingTimeInterval(-86_400 * TimeInterval(totalDays - 2))
             )
 
+            // TODO: calculate end date based on next scheduled date or current date + N.
+            // Either show future day with scheduled date as upper bound,
+            // or current date + N if next scheduled date < than that.
             let endDate = calendar.startOfDay(
                 for: currentDate.addingTimeInterval(86_400 * 3)
             )
@@ -134,14 +137,14 @@ extension Date {
                 CleaningPoint(id: UUID().uuidString, date: Date("2025/07/20 17:00"), color: .red),
                 CleaningPoint(id: UUID().uuidString, date: Date("2025/07/18 17:50"), color: .orange),
                 CleaningPoint(id: UUID().uuidString, date: Date("2025/07/15 19:14"), color: .gray),
-                CleaningPoint(id: UUID().uuidString, date: Date("2025/07/12 19:54"), color: .green),
+                CleaningPoint(id: UUID().uuidString, date: Date("2025/07/10 19:54"), color: .green),
                 CleaningPoint(id: UUID().uuidString, date: Date("2025/07/09 09:22"), color: .green),
                 CleaningPoint(id: UUID().uuidString, date: Date("2025/06/30 18:59"), color: .green),
                 CleaningPoint(id: UUID().uuidString, date: Date("2025/06/27 19:34"), color: .green),
                 CleaningPoint(id: UUID().uuidString, date: Date("2025/06/24 20:31"), color: .green)
             ],
-            startDate: Date("2025/07/12 00:00"),
-            endDate: Date("2025/07/22 00:00")
+            startDate: Date("2025/07/10 00:00"),
+            endDate: Date("2025/07/26 00:00")
         )
     )
 }

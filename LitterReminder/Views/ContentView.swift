@@ -9,13 +9,8 @@ import SwiftData
 import SwiftUI
 
 struct ContentView: View {
-    @Environment(ViewModel.self) private var viewModel
-    @State private var showConfirmMarkComplete = false
-    @State private var sheetContentHeight = CGFloat(0)
-
     var body: some View {
         HomeView()
-            .environment(viewModel)
     }
 }
 
@@ -26,4 +21,5 @@ struct ContentView: View {
                 dependencies: PreviewDependencies()
             )
         )
+        .environment(AppSettings())
 }

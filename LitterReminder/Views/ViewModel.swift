@@ -9,7 +9,8 @@ import EventKit
 import SwiftData
 import SwiftUI
 
-@Observable class ViewModel {
+@Observable
+final class ViewModel {
     var currentDate: Date
 
     var errorMessage: String?

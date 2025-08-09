@@ -11,14 +11,21 @@ import SwiftUI
 @main
 struct LitterReminderApp: App {
     @UIApplicationDelegateAdaptor private var appDelegate: AppDelegate
+
     @Environment(\.scenePhase) private var scenePhase
+
+    @State var appSettings = AppSettings()
+
     let container: ModelContainer
+
     let viewModel: ViewModel
+
     let dependencies: Dependencies
 
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .environment(appSettings)
                 .environment(viewModel)
         }
         .modelContainer(container)
