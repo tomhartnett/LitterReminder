@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct SettingsView: View {
+    @Environment(\.dismiss) private var dismiss
+
     @Bindable var appSettings: AppSettings
 
     @State private var nextCleaningDate = Date()
@@ -20,7 +22,7 @@ struct SettingsView: View {
 
                 Spacer()
 
-                Text(nextCleaningDate, format: .dateTime.weekday().hour().minute())
+                Text(nextCleaningDate, format: .dateTime.weekday().month().day().hour())
                     .font(.callout)
                     .foregroundStyle(.secondary)
             }
@@ -73,6 +75,16 @@ struct SettingsView: View {
         }
         .frame(maxHeight: .infinity, alignment: .top)
         .padding()
+        .toolbar {
+            ToolbarSpacer(.flexible, placement: .topBarTrailing)
+            ToolbarItem(placement: .primaryAction) {
+                Button(role: .confirm, action: {
+                    dismiss()
+                }) {
+                    Image(systemName: "checkmark")
+                }
+            }
+        }
         .onAppear {
             buildDate()
         }

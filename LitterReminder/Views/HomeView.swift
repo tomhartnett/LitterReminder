@@ -147,25 +147,12 @@ struct HomeView: View {
 
     @ViewBuilder
     private var confirmSheet: some View {
-        ConfirmView(confirmAction: { completedDate in
-            withAnimation {
-                viewModel.markComplete(completedDate)
-            }
-        })
-        .background {
-            GeometryReader { proxy in
-                Color.clear
-                    .task {
-                        sheetContentHeight = proxy.size.height
-                    }
-            }
-        }
-        .presentationDetents([.height(sheetContentHeight)])
-    }
-
-    @ViewBuilder
-    private var settingsSheet: some View {
-        SettingsView(appSettings: appSettings)
+        NavigationStack {
+            ConfirmView(confirmAction: { completedDate, scheduleNextCleaning in
+                withAnimation {
+                    viewModel.markComplete(completedDate, scheduleNextCleaning: scheduleNextCleaning)
+                }
+            }, nextScheduleDateFromNow: viewModel.nextScheduleDateFromNow)
             .padding()
             .background {
                 GeometryReader { proxy in
@@ -176,6 +163,24 @@ struct HomeView: View {
                 }
             }
             .presentationDetents([.height(sheetContentHeight)])
+        }
+    }
+
+    @ViewBuilder
+    private var settingsSheet: some View {
+        NavigationStack {
+            SettingsView(appSettings: appSettings)
+                .padding()
+                .background {
+                    GeometryReader { proxy in
+                        Color.clear
+                            .task {
+                                sheetContentHeight = proxy.size.height
+                            }
+                    }
+                }
+                .presentationDetents([.height(sheetContentHeight)])
+        }
     }
 }
 

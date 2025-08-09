@@ -14,7 +14,7 @@ struct LitterReminderApp: App {
 
     @Environment(\.scenePhase) private var scenePhase
 
-    @State var appSettings = AppSettings()
+    @State var appSettings: AppSettings
 
     let container: ModelContainer
 
@@ -45,11 +45,15 @@ struct LitterReminderApp: App {
                 migrationPlan: CleaningMigrationPlan.self
             )
 
+            let appSettings = AppSettings()
+            _appSettings = State(wrappedValue: appSettings)
+
             dependencies = AppDependencies(
+                appSettings: appSettings,
                 cleaningService: DefaultCleaningService(modelContext: container.mainContext),
                 notificationService: DefaultNotificationService(),
                 reminderService: DefaultReminderService(),
-                schedulingService: DefaultSchedulingService()
+                schedulingService: DefaultSchedulingService(appSettings: appSettings)
             )
 
             viewModel = ViewModel(dependencies: dependencies)

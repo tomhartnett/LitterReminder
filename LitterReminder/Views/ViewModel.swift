@@ -45,6 +45,10 @@ final class ViewModel {
             .first
     }
 
+    var nextScheduleDateFromNow: Date {
+        dependencies.schedulingService.nextCleaningDate()
+    }
+
     private var eventStore: EKEventStore
 
     let dependencies: Dependencies
@@ -83,14 +87,14 @@ final class ViewModel {
         }
     }
 
-    func markComplete(_ currentDate: Date = .now) {
+    func markComplete(_ currentDate: Date = .now, scheduleNextCleaning: Bool) {
         guard let scheduledCleaning else {
             return
         }
 
         Task {
             do {
-                try await dependencies.markCompleteUseCase.execute(for: scheduledCleaning, completedDate: currentDate)
+                try await dependencies.markCompleteUseCase.execute(for: scheduledCleaning, completedDate: currentDate, scheduleNextCleaning: scheduleNextCleaning)
                 fetchData()
             } catch {
                 // TODO: handle error

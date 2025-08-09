@@ -18,6 +18,7 @@ protocol Dependencies {
 }
 
 final class AppDependencies: Dependencies {
+    let appSettings: AppSettings
     let cleaningService: CleaningService
     let notificationService: NotificationService
     let reminderService: ReminderService
@@ -27,17 +28,20 @@ final class AppDependencies: Dependencies {
     let markCompleteUseCase: MarkCompleteUseCase
 
     init(
+        appSettings: AppSettings,
         cleaningService: CleaningService,
         notificationService: NotificationService,
         reminderService: ReminderService,
         schedulingService: SchedulingService
     ) {
+        self.appSettings = appSettings
         self.cleaningService = cleaningService
         self.notificationService = notificationService
         self.reminderService = reminderService
         self.schedulingService = schedulingService
 
         addCleaningUseCase = DefaultAddCleaningUseCase(
+            appSettings: appSettings,
             cleaningService: cleaningService,
             reminderService: reminderService,
             notificationService: notificationService,
@@ -51,6 +55,7 @@ final class AppDependencies: Dependencies {
         )
 
         markCompleteUseCase = DefaultMarkCompleteUseCase(
+            appSettings: appSettings,
             cleaningService: cleaningService,
             reminderService: reminderService,
             notificationService: notificationService,
