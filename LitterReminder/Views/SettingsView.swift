@@ -19,18 +19,21 @@ struct SettingsView: View {
             HStack {
                 Text("Schedule Settings")
                     .fontWeight(.medium)
+                    .fixedSize(horizontal: false, vertical: true)
 
                 Spacer()
 
                 Text(nextCleaningDate, format: .dateTime.weekday().month().day().hour())
                     .font(.callout)
                     .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
             }
 
             Stepper(value: $appSettings.nextCleaningDaysOut, in: 1...7) {
                 HStack {
                     Text("Days from now:")
                         .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
 
                     Spacer()
 
@@ -43,6 +46,7 @@ struct SettingsView: View {
                 HStack {
                     Text("Time of day:")
                         .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
 
                     Spacer()
 
@@ -53,25 +57,42 @@ struct SettingsView: View {
 
             Divider()
 
-            Toggle(isOn: $appSettings.isNotificationsEnabled) {
-                Text("Send me a notification")
+            Toggle(isOn: $appSettings.isAutoScheduleEnabled) {
+                Text("Automatic scheduling")
                     .fontWeight(.medium)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+
+            Text("Automatically schedule the next cleaning when one is marked complete.")
+                .font(.callout)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+
+            Divider()
+
+            Toggle(isOn: $appSettings.isNotificationsEnabled) {
+                Text("Notifications")
+                    .fontWeight(.medium)
+                    .fixedSize(horizontal: false, vertical: true)
             }
 
             Text("A notification will be sent when it's time to clean the litter box.")
                 .font(.callout)
                 .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
 
             Divider()
 
             Toggle(isOn: $appSettings.isRemindersEnabled) {
-                Text("Add to Reminders app")
+                Text("Reminders")
                     .fontWeight(.medium)
+                    .fixedSize(horizontal: false, vertical: true)
             }
 
             Text("A reminder will be added to the Reminders app.")
                 .font(.callout)
                 .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
         }
         .frame(maxHeight: .infinity, alignment: .top)
         .padding()

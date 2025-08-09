@@ -29,6 +29,12 @@ class AppSettings {
         }
     }
 
+    var isAutoScheduleEnabled: Bool = false {
+        didSet {
+            saveSetting(isAutoScheduleEnabled, key: .isAutoScheduleEnabled)
+        }
+    }
+
     var isNotificationsEnabled: Bool = false {
         didSet {
             saveSetting(isNotificationsEnabled, key: .isNotificationsEnabled)
@@ -42,6 +48,7 @@ class AppSettings {
     }
 
     private func loadSettings() {
+        isAutoScheduleEnabled = getSetting(.isAutoScheduleEnabled) ?? true
         isNotificationsEnabled = getSetting(.isNotificationsEnabled) ?? false
         isRemindersEnabled = getSetting(.isRemindersEnabled) ?? false
         nextCleaningHourOfDay = getSetting(.nextCleaningHourOfDay) ?? 17
@@ -59,9 +66,10 @@ class AppSettings {
 
 extension AppSettings {
     private enum StorageKey: String {
-        case nextCleaningHourOfDay = "appSetting-nextCleaningHourOfDay"
-        case nextCleaningDaysOut = "appSetting-nextCleaningDaysOut"
+        case isAutoScheduleEnabled = "appSetting-isAutoScheduleEnabled"
         case isNotificationsEnabled = "appSetting-isNotificationsEnabled"
         case isRemindersEnabled = "appSetting-isRemindersEnabled"
+        case nextCleaningHourOfDay = "appSetting-nextCleaningHourOfDay"
+        case nextCleaningDaysOut = "appSetting-nextCleaningDaysOut"
     }
 }

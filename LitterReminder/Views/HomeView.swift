@@ -118,7 +118,7 @@ struct HomeView: View {
     @ViewBuilder
     private var actionButton: some View {
         if !viewModel.hasScheduledCleaning {
-            Button(action: {
+            Button(role: .confirm, action: {
                 Task {
                     withAnimation {
                         viewModel.addCleaning()
@@ -133,7 +133,7 @@ struct HomeView: View {
             }
 
         } else {
-            Button(action: {
+            Button(role: .confirm, action: {
                 sheet = .confirmMarkComplete
             }) {
                 HStack {
@@ -148,21 +148,16 @@ struct HomeView: View {
     @ViewBuilder
     private var confirmSheet: some View {
         NavigationStack {
-            ConfirmView(confirmAction: { completedDate, scheduleNextCleaning in
-                withAnimation {
-                    viewModel.markComplete(completedDate, scheduleNextCleaning: scheduleNextCleaning)
-                }
-            }, nextScheduleDateFromNow: viewModel.nextScheduleDateFromNow)
-            .padding()
-            .background {
-                GeometryReader { proxy in
-                    Color.clear
-                        .task {
-                            sheetContentHeight = proxy.size.height
-                        }
-                }
-            }
-            .presentationDetents([.height(sheetContentHeight)])
+            ConfirmView(
+                confirmAction: { completedDate, scheduleNextCleaning in
+                    withAnimation {
+                        viewModel.markComplete(completedDate, scheduleNextCleaning: scheduleNextCleaning)
+                    }
+                },
+                nextScheduleDateFromNow: viewModel.nextScheduleDateFromNow,
+                isAutoSchedulingEnabled: appSettings.isAutoScheduleEnabled
+            )
+            .presentationDetents([.medium])
         }
     }
 
@@ -170,16 +165,6 @@ struct HomeView: View {
     private var settingsSheet: some View {
         NavigationStack {
             SettingsView(appSettings: appSettings)
-                .padding()
-                .background {
-                    GeometryReader { proxy in
-                        Color.clear
-                            .task {
-                                sheetContentHeight = proxy.size.height
-                            }
-                    }
-                }
-                .presentationDetents([.height(sheetContentHeight)])
         }
     }
 }

@@ -18,12 +18,13 @@ struct ConfirmView: View {
 
     var nextScheduleDateFromNow: Date
 
+    var isAutoSchedulingEnabled: Bool
+
     var body: some View {
         VStack(spacing: 16) {
             DatePicker(selection: $completedDate) {
-                Text("Completed at:")
-                    .font(.callout)
             }
+            .labelsHidden()
 
             Divider()
 
@@ -36,6 +37,7 @@ struct ConfirmView: View {
                 }
             }
         }
+        .frame(maxHeight: .infinity, alignment: .top)
         .padding()
         .navigationTitle("Mark Complete?")
         .navigationBarTitleDisplayMode(.inline)
@@ -57,6 +59,9 @@ struct ConfirmView: View {
                 }
             }
         }
+        .onAppear {
+            scheduleNextCleaning = isAutoSchedulingEnabled
+        }
     }
 }
 
@@ -70,7 +75,8 @@ struct ConfirmView: View {
     .sheet(isPresented: $isPresented) {
         NavigationStack {
             ConfirmView(confirmAction: { completedDate, scheduleNextCleaning in },
-                        nextScheduleDateFromNow: Date().addingTimeInterval(86_400 * 2))
+                        nextScheduleDateFromNow: Date().addingTimeInterval(86_400 * 2),
+                        isAutoSchedulingEnabled: true)
                 .padding()
                 .background {
                     GeometryReader { proxy in
