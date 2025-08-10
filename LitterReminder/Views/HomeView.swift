@@ -7,18 +7,20 @@
 
 import SwiftUI
 
-enum HomeViewSheet: Identifiable {
-    case confirmMarkComplete
-    case settings
+extension HomeView {
+    enum HomeViewSheet: Identifiable {
+        case confirmMarkComplete
+        case settings
 
-    var id: Self {
-        self
+        var id: Self {
+            self
+        }
     }
 }
 
 struct HomeView: View {
     @Environment(AppSettings.self) private var appSettings
-    @Environment(ViewModel.self) private var viewModel
+    @Environment(HomeViewModel.self) private var viewModel
     @State private var sheet: HomeViewSheet?
     @State private var sheetContentHeight = CGFloat(0)
 
@@ -172,7 +174,7 @@ struct HomeView: View {
 #Preview {
     HomeView()
         .environment(
-            ViewModel(
+            HomeViewModel(
                 dependencies: PreviewDependencies()
             )
         )

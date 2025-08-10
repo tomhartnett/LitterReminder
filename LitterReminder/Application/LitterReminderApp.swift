@@ -18,7 +18,7 @@ struct LitterReminderApp: App {
 
     let container: ModelContainer
 
-    let viewModel: ViewModel
+    let homeViewModel: HomeViewModel
 
     let dependencies: Dependencies
 
@@ -26,14 +26,14 @@ struct LitterReminderApp: App {
         WindowGroup {
             ContentView()
                 .environment(appSettings)
-                .environment(viewModel)
+                .environment(homeViewModel)
         }
         .modelContainer(container)
         .onChange(of: scenePhase) { _, newValue in
             if newValue == .active {
-                viewModel.fetchData()
-                viewModel.updateCurrentDate()
-                viewModel.requestAuthorization()
+                homeViewModel.fetchData()
+                homeViewModel.updateCurrentDate()
+                homeViewModel.requestAuthorization()
             }
         }
     }
@@ -56,7 +56,7 @@ struct LitterReminderApp: App {
                 schedulingService: DefaultSchedulingService(appSettings: appSettings)
             )
 
-            viewModel = ViewModel(dependencies: dependencies)
+            homeViewModel = HomeViewModel(dependencies: dependencies)
 
             appDelegate.dependencies = dependencies
             appDelegate.modelContainer = container

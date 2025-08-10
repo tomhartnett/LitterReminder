@@ -16,10 +16,4 @@ struct ContentView: View {
 
 #Preview {
     ContentView()
-        .environment(
-            ViewModel(
-                dependencies: PreviewDependencies()
-            )
-        )
-        .environment(AppSettings())
 }

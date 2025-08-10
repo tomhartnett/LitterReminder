@@ -1,5 +1,5 @@
 //
-//  ContentView+ViewModel.swift
+//  HomeViewModel.swift
 //  LitterReminder
 //
 //  Created by Tom Hartnett on 11/24/24.
@@ -10,7 +10,7 @@ import SwiftData
 import SwiftUI
 
 @Observable
-final class ViewModel {
+final class HomeViewModel {
     var currentDate: Date
 
     var errorMessage: String?
