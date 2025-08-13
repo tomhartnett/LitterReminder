@@ -50,12 +50,15 @@ struct ConfirmView: View {
                 }
             }
 
-            ToolbarItem(placement: .primaryAction) {
+            ToolbarItem(placement: .bottomBar) {
                 Button(role: .confirm, action: {
                     dismiss()
                     confirmAction(completedDate, scheduleNextCleaning)
                 }) {
-                    Image(systemName: "checkmark")
+                    HStack {
+                        Image(systemName: "checkmark.square")
+                        Text("Mark Complete")
+                    }
                 }
             }
         }
