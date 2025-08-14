@@ -142,8 +142,8 @@ struct HomeView: View {
                     Image(systemName: "checkmark.square")
                     Text("Mark Complete")
                 }
+                .padding()
             }
-
         }
     }
 

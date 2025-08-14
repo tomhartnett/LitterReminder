@@ -59,6 +59,7 @@ struct ConfirmView: View {
                         Image(systemName: "checkmark.square")
                         Text("Mark Complete")
                     }
+                    .padding()
                 }
             }
         }
@@ -89,7 +90,7 @@ struct ConfirmView: View {
                             }
                     }
                 }
-                .presentationDetents([.height(sheetContentHeight)])
+                .presentationDetents([.medium])
         }
     }
 }

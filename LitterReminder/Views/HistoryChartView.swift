@@ -69,23 +69,33 @@ extension HistoryChartView {
 
         init(_ cleanings: [Cleaning], currentDate: Date, totalDays: Int = 14) {
             let calendar = Calendar.current
-            let startDate = calendar.startOfDay(
-                for: currentDate.addingTimeInterval(-86_400 * TimeInterval(totalDays - 2))
-            )
+            let startOfToday = calendar.startOfDay(for: currentDate)
+            let twoDaysFromNow = calendar.date(byAdding: .day, value: 2, to: startOfToday)!
 
-            // TODO: calculate end date based on next scheduled date or current date + N.
-            // Either show future day with scheduled date as upper bound,
-            // or current date + N if next scheduled date < than that.
-            let endDate = calendar.startOfDay(
-                for: currentDate.addingTimeInterval(86_400 * 3)
+            let endDate: Date
+            if let nextCleaning = cleanings
+                .filter({ !$0.isComplete })
+                .sorted(by: { $0.scheduledDate < $1.scheduledDate })
+                .last {
+                endDate = calendar.startOfDay(
+                    for: max(nextCleaning.scheduledDate, twoDaysFromNow)
+                )
+            } else {
+                endDate = twoDaysFromNow
+            }
+
+            let startDate = calendar.startOfDay(
+                for: calendar.date(byAdding: .day, value: -totalDays, to: endDate)!
             )
 
             self.points = cleanings
                 .filter({ $0.scheduledDate >= startDate })
                 .map({ CleaningPoint($0, currentDate: currentDate) })
 
+            print("🍕 \(startDate)–\(endDate)")
+
             self.startDate = startDate
-            self.endDate = endDate
+            self.endDate = calendar.date(byAdding: .day, value: 1, to: endDate)!
         }
     }
 }
