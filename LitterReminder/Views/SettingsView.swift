@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import UIKit
 
 struct SettingsView: View {
     @Environment(\.dismiss) private var dismiss
@@ -13,6 +14,10 @@ struct SettingsView: View {
     @Bindable var appSettings: AppSettings
 
     @State private var nextCleaningDate = Date()
+
+    @State private var isNotificationsEnabled = false
+
+    @State private var showNotificationsAlert = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -70,11 +75,16 @@ struct SettingsView: View {
 
             Divider()
 
-            Toggle(isOn: $appSettings.isNotificationsEnabled) {
-                Text("Notifications")
-                    .fontWeight(.medium)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
+            PermissionToggle(
+                isOn: $isNotificationsEnabled,
+                label: "Notifications",
+                attemptToEnable: {
+                    Task {
+                        await enableNotifications()
+                    }
+                },
+                attemptToDisable: { disableNotifications() }
+            )
 
             Text("A notification will be sent when it's time to clean the litter box.")
                 .font(.callout)
@@ -106,8 +116,28 @@ struct SettingsView: View {
                 }
             }
         }
+        .alert(
+            "Allow Notifications",
+            isPresented: $showNotificationsAlert,
+            actions: {
+                Button(role: .cancel, action: {}) {
+                    Text("Cancel")
+                }
+
+                Button(role: .confirm, action: {
+                    guard let url = URL(string: UIApplication.openSettingsURLString) else { return }
+                    UIApplication.shared.open(url)
+                }) {
+                    Text("Settings")
+                }
+            }, message: {
+                Text("Notifications are not allowed. Open Settings to allow.")
+            }
+        )
         .onAppear {
             buildDate()
+
+            isNotificationsEnabled = appSettings.isNotificationsEnabled
         }
         .onChange(of: appSettings.nextCleaningDaysOut) { _, _ in
             buildDate()
@@ -127,6 +157,34 @@ struct SettingsView: View {
     func formatHour() -> String {
         let date = Calendar.current.date(bySettingHour: appSettings.nextCleaningHourOfDay, minute: 0, second: 0, of: Date())!
         return date.formatted(date: .omitted, time: .standard)
+    }
+
+    func enableNotifications() async {
+        isNotificationsEnabled = true
+        let center = UNUserNotificationCenter.current()
+        let settings = await center.notificationSettings()
+        switch settings.authorizationStatus {
+        case .notDetermined:
+            do {
+                let authorized = try await center.requestAuthorization(options: [.alert, .badge, .sound])
+                isNotificationsEnabled = authorized
+                appSettings.isNotificationsEnabled = authorized
+            } catch {
+                isNotificationsEnabled = false
+            }
+        case .denied:
+            showNotificationsAlert = true
+            isNotificationsEnabled = false
+        case .authorized, .provisional, .ephemeral:
+            appSettings.isNotificationsEnabled = true
+        @unknown default:
+            break
+        }
+    }
+
+    func disableNotifications() {
+        isNotificationsEnabled = false
+        appSettings.isNotificationsEnabled = false
     }
 }
 

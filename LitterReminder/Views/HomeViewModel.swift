@@ -104,11 +104,6 @@ final class HomeViewModel {
 
     func requestAuthorization() {
         dependencies.reminderService.requestRemindersAccess()
-
-        Task {
-            // TODO: handle error
-            try await dependencies.notificationService.requestAuthorization()
-        }
     }
 
     func updateCurrentDate() {

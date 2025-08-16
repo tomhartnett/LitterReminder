@@ -92,8 +92,6 @@ extension HistoryChartView {
                 .filter({ $0.scheduledDate >= startDate })
                 .map({ CleaningPoint($0, currentDate: currentDate) })
 
-            print("🍕 \(startDate)–\(endDate)")
-
             self.startDate = startDate
             self.endDate = calendar.date(byAdding: .day, value: 1, to: endDate)!
         }
