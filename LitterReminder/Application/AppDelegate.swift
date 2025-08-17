@@ -50,7 +50,6 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
         switch response.actionIdentifier {
         case NotificationConstants.markCompleteAction:
             do {
-                // TODO: add setting for scheduleNextCleaning
                 try await dependencies?.markCompleteUseCase.execute(for: cleaning, completedDate: .now, scheduleNextCleaning: true)
             } catch {
                 // TODO: handle error
