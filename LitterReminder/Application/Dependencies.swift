@@ -62,6 +62,11 @@ final class AppDependencies: Dependencies {
             notificationService: notificationService,
             schedulingService: schedulingService
         )
+
+        appSettings.isRemindersEnabled = reminderService.isPermissionGranted
+        Task {
+            appSettings.isNotificationsEnabled = await notificationService.isPermissionGranted
+        }
     }
 }
 

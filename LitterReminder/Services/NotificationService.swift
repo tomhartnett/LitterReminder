@@ -9,6 +9,7 @@ import Foundation
 import UserNotifications
 
 protocol NotificationService {
+    var isPermissionGranted: Bool { get async }
     func deleteNotification(_ identifier: String)
     func registerNotifications()
     func requestAuthorization() async throws -> Bool
@@ -45,6 +46,27 @@ extension NotificationService {
 
 final class DefaultNotificationService: NotificationService {
     let center = UNUserNotificationCenter.current()
+
+    var isPermissionGranted: Bool {
+        get async {
+            let settings = await center.notificationSettings()
+            let status = settings.authorizationStatus
+            switch status {
+            case .notDetermined:
+                return false
+            case .denied:
+                return false
+            case .authorized:
+                return true
+            case .provisional:
+                return true
+            case .ephemeral:
+                return true
+            @unknown default:
+                return false
+            }
+        }
+    }
 
     func registerNotifications() {
         let markCompleteAction = UNNotificationAction(identifier: NotificationConstants.markCompleteAction, title: "Mark Complete")
@@ -130,6 +152,10 @@ final class DefaultNotificationService: NotificationService {
 }
 
 final class PreviewNotificationService: NotificationService {
+    var isPermissionGranted: Bool {
+        true
+    }
+
     func deleteNotification(_ identifier: String) {}
 
     func registerNotifications() {}

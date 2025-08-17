@@ -9,6 +9,7 @@ import EventKit
 import Foundation
 
 protocol ReminderService {
+    var isPermissionGranted: Bool { get }
     func addReminder(_ dueDate: Date) throws -> String
     func completeReminder(_ identifier: String, completionDate: Date) throws
     func deleteReminder(_ identifier: String) throws
@@ -37,6 +38,24 @@ enum ReminderServiceError: Error, LocalizedError {
 
 final class DefaultReminderService: ReminderService {
     let eventStore = EKEventStore()
+
+    var isPermissionGranted: Bool {
+        let status = EKEventStore.authorizationStatus(for: .reminder)
+        switch status {
+        case .notDetermined:
+            return false
+        case .restricted:
+            return false
+        case .denied:
+            return false
+        case .fullAccess:
+            return true
+        case .writeOnly:
+            return false
+        @unknown default:
+            return false
+        }
+    }
 
     func addReminder(_ dueDate: Date) throws -> String {
         guard let calendar = eventStore.calendars(for: .reminder).first(where: { $0.title == "Reminders" }) else {
@@ -120,6 +139,10 @@ final class DefaultReminderService: ReminderService {
 }
 
 final class PreviewReminderService: ReminderService {
+    var isPermissionGranted: Bool {
+        true
+    }
+
     func addReminder(_ dueDate: Date) throws -> String {
         UUID().uuidString
     }
