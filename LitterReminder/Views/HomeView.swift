@@ -20,8 +20,13 @@ extension HomeView {
 
 struct HomeView: View {
     @Environment(AppSettings.self) private var appSettings
+
+    @Environment(\.dependencies) private var dependencies: Dependencies
+
     @Environment(HomeViewModel.self) private var viewModel
+
     @State private var sheet: HomeViewSheet?
+
     @State private var sheetContentHeight = CGFloat(0)
 
     var body: some View {
@@ -166,7 +171,7 @@ struct HomeView: View {
     @ViewBuilder
     private var settingsSheet: some View {
         NavigationStack {
-            SettingsView(appSettings: appSettings, dependencies: viewModel.dependencies)
+            SettingsView(appSettings: appSettings, dependencies: dependencies)
         }
     }
 }

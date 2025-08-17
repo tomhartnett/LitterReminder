@@ -7,7 +7,7 @@
 
 import Foundation
 
-protocol Dependencies {
+protocol Dependencies: Observable {
     var notificationService: NotificationService { get }
     var reminderService: ReminderService { get }
     var schedulingService: SchedulingService { get }
@@ -17,6 +17,7 @@ protocol Dependencies {
     var markCompleteUseCase: MarkCompleteUseCase { get }
 }
 
+@Observable
 final class AppDependencies: Dependencies {
     let appSettings: AppSettings
     let cleaningService: CleaningService
@@ -64,6 +65,7 @@ final class AppDependencies: Dependencies {
     }
 }
 
+@Observable
 final class PreviewDependencies: Dependencies {
     let notificationService: NotificationService = PreviewNotificationService()
     let reminderService: ReminderService = PreviewReminderService()

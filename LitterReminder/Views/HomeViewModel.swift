@@ -49,9 +49,9 @@ final class HomeViewModel {
         dependencies.schedulingService.nextCleaningDate()
     }
 
-    private var eventStore: EKEventStore
+    private let eventStore: EKEventStore
 
-    let dependencies: Dependencies
+    private let dependencies: Dependencies
 
     init(
         dependencies: Dependencies,

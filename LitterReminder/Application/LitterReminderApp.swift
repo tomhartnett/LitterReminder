@@ -20,13 +20,14 @@ struct LitterReminderApp: App {
 
     let homeViewModel: HomeViewModel
 
-    let dependencies: Dependencies
+    let dependencies: AppDependencies
 
     var body: some Scene {
         WindowGroup {
             ContentView()
                 .environment(appSettings)
                 .environment(homeViewModel)
+                .environment(\.dependencies, dependencies)
         }
         .modelContainer(container)
         .onChange(of: scenePhase) { _, newValue in
@@ -59,6 +60,7 @@ struct LitterReminderApp: App {
 
             appDelegate.dependencies = dependencies
             appDelegate.modelContainer = container
+
         } catch {
             fatalError("Failed to create dependencies or ViewModel.")
         }
