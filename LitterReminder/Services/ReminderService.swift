@@ -12,13 +12,14 @@ protocol ReminderService {
     func addReminder(_ dueDate: Date) throws -> String
     func completeReminder(_ identifier: String, completionDate: Date) throws
     func deleteReminder(_ identifier: String) throws
-    func requestRemindersAccess()
+    func requestRemindersAccess() async throws -> Bool
 }
 
 enum ReminderServiceError: Error, LocalizedError {
     case calendarNotFound
     case failedToRemove(Error?)
     case failedToSave(Error?)
+    case permissionsError(String, Bool)
 
     var errorDescription: String? {
         switch self {
@@ -28,6 +29,8 @@ enum ReminderServiceError: Error, LocalizedError {
             return "Could not remove reminder from the system".appendingError(error)
         case .failedToSave(let error):
             return "Could not save reminder to the system".appendingError(error)
+        case .permissionsError(let message, _):
+            return message
         }
     }
 }
@@ -81,41 +84,51 @@ final class DefaultReminderService: ReminderService {
         }
     }
 
-    func requestRemindersAccess() {
+    func requestRemindersAccess() async throws -> Bool {
         let status = EKEventStore.authorizationStatus(for: .reminder)
         switch status {
         case .notDetermined:
-            eventStore.requestFullAccessToReminders { granted, errorOrNil in
-                if errorOrNil != nil {
-                    // Message error
-                }
+            return try await eventStore.requestFullAccessToReminders()
 
-                if !granted {
-                    // Message something
-                }
-            }
         case .restricted:
-            break // Need to prompt for something
+            throw ReminderServiceError.permissionsError(
+                "Reminders access is restricted on this device.",
+                false
+            )
         case .denied:
-            break // Need to prompt for Settings
+            throw ReminderServiceError.permissionsError(
+                "Reminders access was previously denied. Go to Settings to allow it.",
+                true
+            )
         case .fullAccess:
-            break
+            return true
+
         case .writeOnly:
-            break // Should never happen
+            // Should never happen
+            throw ReminderServiceError.permissionsError(
+                "Reminders access is write-only on this device. This is insufficient for this feature.",
+                false
+            )
+
         @unknown default:
-            break
+            throw ReminderServiceError.permissionsError(
+                "An unknown Reminders authorization status has been encountered.",
+                false
+            )
         }
     }
 }
 
 final class PreviewReminderService: ReminderService {
     func addReminder(_ dueDate: Date) throws -> String {
-        return UUID().uuidString
+        UUID().uuidString
     }
     
     func completeReminder(_ identifier: String, completionDate: Date) throws {}
 
     func deleteReminder(_ identifier: String) throws {}
 
-    func requestRemindersAccess() {}
+    func requestRemindersAccess() async throws -> Bool {
+        true
+    }
 }

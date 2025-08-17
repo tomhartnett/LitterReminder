@@ -11,7 +11,7 @@ import UserNotifications
 protocol NotificationService {
     func deleteNotification(_ identifier: String)
     func registerNotifications()
-    func requestAuthorization() async throws
+    func requestAuthorization() async throws -> Bool
     func scheduleNotification(_ dueDate: Date, occurrence: Int) async throws -> String
 }
 
@@ -25,14 +25,14 @@ enum NotificationConstants {
 
 enum NotificationServiceError: Error, LocalizedError {
     case failedToAdd(Error?)
-    case requestAuthorizationError(Error?)
+    case permissionsError(String, Bool)
 
     var errorDescription: String? {
         switch self {
         case .failedToAdd(let error):
             return "Could not add notification to the system".appendingError(error)
-        case .requestAuthorizationError(let error):
-            return "Error requesting authorization for notifications".appendingError(error)
+        case .permissionsError(let message, _):
+            return message
         }
     }
 }
@@ -60,14 +60,33 @@ final class DefaultNotificationService: NotificationService {
         center.setNotificationCategories([scheduledCleaningCategory])
     }
 
-    func requestAuthorization() async throws {
+    func requestAuthorization() async throws -> Bool {
         let settings = await center.notificationSettings()
-        guard settings.authorizationStatus == .notDetermined else { return }
+        let status = settings.authorizationStatus
 
-        do {
-            try await center.requestAuthorization(options: [.alert, .badge, .sound])
-        } catch {
-            throw NotificationServiceError.requestAuthorizationError(error)
+        switch status {
+        case .notDetermined:
+            return try await center.requestAuthorization(options: [.alert, .badge, .sound])
+
+        case .denied:
+            throw NotificationServiceError.permissionsError(
+                "Notifications were previously denied. Go to Settings to allow it.",
+                true
+            )
+        case .authorized:
+            return true
+
+        case .provisional:
+            return true
+
+        case .ephemeral:
+            return true
+
+        @unknown default:
+            throw NotificationServiceError.permissionsError(
+                "An unknown Notifications authorization status has been encountered.",
+                false
+            )
         }
     }
 
@@ -115,7 +134,9 @@ final class PreviewNotificationService: NotificationService {
 
     func registerNotifications() {}
 
-    func requestAuthorization() async throws {}
+    func requestAuthorization() async throws -> Bool {
+        true
+    }
 
     func scheduleNotification(_ dueDate: Date, occurrence: Int) async throws -> String {
         UUID().uuidString

@@ -33,7 +33,6 @@ struct LitterReminderApp: App {
             if newValue == .active {
                 homeViewModel.fetchData()
                 homeViewModel.updateCurrentDate()
-                homeViewModel.requestAuthorization()
             }
         }
     }

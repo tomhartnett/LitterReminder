@@ -166,7 +166,7 @@ struct HomeView: View {
     @ViewBuilder
     private var settingsSheet: some View {
         NavigationStack {
-            SettingsView(appSettings: appSettings)
+            SettingsView(appSettings: appSettings, dependencies: viewModel.dependencies)
         }
     }
 }

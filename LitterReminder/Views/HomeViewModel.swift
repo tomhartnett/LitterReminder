@@ -102,10 +102,6 @@ final class HomeViewModel {
         }
     }
 
-    func requestAuthorization() {
-        dependencies.reminderService.requestRemindersAccess()
-    }
-
     func updateCurrentDate() {
         currentDate = .now
     }

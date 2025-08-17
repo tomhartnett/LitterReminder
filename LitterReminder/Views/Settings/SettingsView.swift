@@ -8,16 +8,25 @@
 import SwiftUI
 import UIKit
 
+struct AlertDetails: Identifiable {
+    let id = UUID()
+    let message: String
+    let showSettingsButton: Bool
+}
+
 struct SettingsView: View {
     @Environment(\.dismiss) private var dismiss
 
     @Bindable var appSettings: AppSettings
 
+    @State private var viewModel: SettingsViewModel
+
     @State private var nextCleaningDate = Date()
 
-    @State private var isNotificationsEnabled = false
-
-    @State private var showNotificationsAlert = false
+    init(appSettings: AppSettings, dependencies: Dependencies) {
+        _viewModel = State(wrappedValue: SettingsViewModel(appSettings: appSettings, dependencies: dependencies))
+        _appSettings = Bindable(appSettings)
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -76,14 +85,14 @@ struct SettingsView: View {
             Divider()
 
             PermissionToggle(
-                isOn: $isNotificationsEnabled,
+                isOn: .constant(viewModel.isNotificationsEnabled),
                 label: "Notifications",
                 attemptToEnable: {
                     Task {
-                        await enableNotifications()
+                        await viewModel.enableNotifications()
                     }
                 },
-                attemptToDisable: { disableNotifications() }
+                attemptToDisable: { viewModel.disableNotifications() }
             )
 
             Text("A notification will be sent when it's time to clean the litter box.")
@@ -93,11 +102,16 @@ struct SettingsView: View {
 
             Divider()
 
-            Toggle(isOn: $appSettings.isRemindersEnabled) {
-                Text("Reminders")
-                    .fontWeight(.medium)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
+            PermissionToggle(
+                isOn: .constant(viewModel.isRemindersEnabled),
+                label: "Reminders",
+                attemptToEnable: {
+                    viewModel.enableReminders()
+                },
+                attemptToDisable: {
+                    viewModel.disableReminders()
+                }
+            )
 
             Text("A reminder will be added to the Reminders app.")
                 .font(.callout)
@@ -115,29 +129,48 @@ struct SettingsView: View {
                     Image(systemName: "checkmark")
                 }
             }
+
+            ToolbarItem(placement: .bottomBar) {
+                Button(role: .confirm, action: {
+                    dismiss()
+                }) {
+                    HStack {
+                        Image(systemName: "checkmark.circle")
+                        Text("Done")
+                    }
+                    .padding()
+                }
+            }
         }
         .alert(
-            "Allow Notifications",
-            isPresented: $showNotificationsAlert,
-            actions: {
-                Button(role: .cancel, action: {}) {
+            "Permission Needed",
+            isPresented: .constant(viewModel.settingsAlert != nil),
+            presenting: viewModel.settingsAlert,
+            actions: { alertDetails in
+                Button(role: .cancel, action: {
+                    viewModel.settingsAlert = nil
+                }) {
                     Text("Cancel")
                 }
 
-                Button(role: .confirm, action: {
-                    guard let url = URL(string: UIApplication.openSettingsURLString) else { return }
-                    UIApplication.shared.open(url)
-                }) {
-                    Text("Settings")
+                if alertDetails.showSettingsButton {
+                    Button(role: .confirm, action: {
+                        viewModel.settingsAlert = nil
+                        guard let url = URL(string: UIApplication.openSettingsURLString) else { return }
+                        UIApplication.shared.open(url)
+                    }) {
+                        Text("Settings")
+                    }
                 }
-            }, message: {
-                Text("Notifications are not allowed. Open Settings to allow.")
+            },
+            message: { details in
+                Text(details.message)
             }
         )
         .onAppear {
             buildDate()
 
-            isNotificationsEnabled = appSettings.isNotificationsEnabled
+            viewModel.isNotificationsEnabled = appSettings.isNotificationsEnabled
         }
         .onChange(of: appSettings.nextCleaningDaysOut) { _, _ in
             buildDate()
@@ -158,36 +191,10 @@ struct SettingsView: View {
         let date = Calendar.current.date(bySettingHour: appSettings.nextCleaningHourOfDay, minute: 0, second: 0, of: Date())!
         return date.formatted(date: .omitted, time: .standard)
     }
-
-    func enableNotifications() async {
-        isNotificationsEnabled = true
-        let center = UNUserNotificationCenter.current()
-        let settings = await center.notificationSettings()
-        switch settings.authorizationStatus {
-        case .notDetermined:
-            do {
-                let authorized = try await center.requestAuthorization(options: [.alert, .badge, .sound])
-                isNotificationsEnabled = authorized
-                appSettings.isNotificationsEnabled = authorized
-            } catch {
-                isNotificationsEnabled = false
-            }
-        case .denied:
-            showNotificationsAlert = true
-            isNotificationsEnabled = false
-        case .authorized, .provisional, .ephemeral:
-            appSettings.isNotificationsEnabled = true
-        @unknown default:
-            break
-        }
-    }
-
-    func disableNotifications() {
-        isNotificationsEnabled = false
-        appSettings.isNotificationsEnabled = false
-    }
 }
 
 #Preview {
-    SettingsView(appSettings: AppSettings())
+    NavigationStack {
+        SettingsView(appSettings: AppSettings(), dependencies: PreviewDependencies())
+    }
 }

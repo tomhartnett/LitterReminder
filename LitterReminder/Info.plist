@@ -2,7 +2,9 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 	<key>NSRemindersFullAccessUsageDescription</key>
-	<string>Used to add reminders to clean the litter box.</string>
+	<string>LitterReminder will add a reminder to clean the litter box.</string>
 </dict>
 </plist>
