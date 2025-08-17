@@ -69,12 +69,23 @@ extension HistoryChartView {
 
         init(_ cleanings: [Cleaning], currentDate: Date, totalDays: Int = 14) {
             let calendar = Calendar.current
-            let startDate = calendar.startOfDay(
-                for: currentDate.addingTimeInterval(-86_400 * TimeInterval(totalDays - 2))
-            )
+            let startOfToday = calendar.startOfDay(for: currentDate)
+            let twoDaysFromNow = calendar.date(byAdding: .day, value: 2, to: startOfToday)!
 
-            let endDate = calendar.startOfDay(
-                for: currentDate.addingTimeInterval(86_400 * 3)
+            let endDate: Date
+            if let nextCleaning = cleanings
+                .filter({ !$0.isComplete })
+                .sorted(by: { $0.scheduledDate < $1.scheduledDate })
+                .last {
+                endDate = calendar.startOfDay(
+                    for: max(nextCleaning.scheduledDate, twoDaysFromNow)
+                )
+            } else {
+                endDate = twoDaysFromNow
+            }
+
+            let startDate = calendar.startOfDay(
+                for: calendar.date(byAdding: .day, value: -totalDays, to: endDate)!
             )
 
             self.points = cleanings
@@ -85,7 +96,7 @@ extension HistoryChartView {
                 .map({ CleaningPoint($0, currentDate: currentDate) })
 
             self.startDate = startDate
-            self.endDate = endDate
+            self.endDate = calendar.date(byAdding: .day, value: 1, to: endDate)!
         }
     }
 }
@@ -137,14 +148,14 @@ extension Date {
                 CleaningPoint(id: UUID().uuidString, date: Date("2025/07/20 17:00"), color: .red),
                 CleaningPoint(id: UUID().uuidString, date: Date("2025/07/18 17:50"), color: .orange),
                 CleaningPoint(id: UUID().uuidString, date: Date("2025/07/15 19:14"), color: .gray),
-                CleaningPoint(id: UUID().uuidString, date: Date("2025/07/12 19:54"), color: .green),
+                CleaningPoint(id: UUID().uuidString, date: Date("2025/07/10 19:54"), color: .green),
                 CleaningPoint(id: UUID().uuidString, date: Date("2025/07/09 09:22"), color: .green),
                 CleaningPoint(id: UUID().uuidString, date: Date("2025/06/30 18:59"), color: .green),
                 CleaningPoint(id: UUID().uuidString, date: Date("2025/06/27 19:34"), color: .green),
                 CleaningPoint(id: UUID().uuidString, date: Date("2025/06/24 20:31"), color: .green)
             ],
-            startDate: Date("2025/07/12 00:00"),
-            endDate: Date("2025/07/22 00:00")
+            startDate: Date("2025/07/10 00:00"),
+            endDate: Date("2025/07/26 00:00")
         )
     )
 }

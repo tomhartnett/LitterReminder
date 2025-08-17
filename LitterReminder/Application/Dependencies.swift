@@ -7,7 +7,7 @@
 
 import Foundation
 
-protocol Dependencies {
+protocol Dependencies: Observable {
     var notificationService: NotificationService { get }
     var reminderService: ReminderService { get }
     var schedulingService: SchedulingService { get }
@@ -17,7 +17,9 @@ protocol Dependencies {
     var markCompleteUseCase: MarkCompleteUseCase { get }
 }
 
+@Observable
 final class AppDependencies: Dependencies {
+    let appSettings: AppSettings
     let cleaningService: CleaningService
     let notificationService: NotificationService
     let reminderService: ReminderService
@@ -27,17 +29,20 @@ final class AppDependencies: Dependencies {
     let markCompleteUseCase: MarkCompleteUseCase
 
     init(
+        appSettings: AppSettings,
         cleaningService: CleaningService,
         notificationService: NotificationService,
         reminderService: ReminderService,
         schedulingService: SchedulingService
     ) {
+        self.appSettings = appSettings
         self.cleaningService = cleaningService
         self.notificationService = notificationService
         self.reminderService = reminderService
         self.schedulingService = schedulingService
 
         addCleaningUseCase = DefaultAddCleaningUseCase(
+            appSettings: appSettings,
             cleaningService: cleaningService,
             reminderService: reminderService,
             notificationService: notificationService,
@@ -51,14 +56,21 @@ final class AppDependencies: Dependencies {
         )
 
         markCompleteUseCase = DefaultMarkCompleteUseCase(
+            appSettings: appSettings,
             cleaningService: cleaningService,
             reminderService: reminderService,
             notificationService: notificationService,
             schedulingService: schedulingService
         )
+
+        appSettings.isRemindersEnabled = reminderService.isPermissionGranted
+        Task {
+            appSettings.isNotificationsEnabled = await notificationService.isPermissionGranted
+        }
     }
 }
 
+@Observable
 final class PreviewDependencies: Dependencies {
     let notificationService: NotificationService = PreviewNotificationService()
     let reminderService: ReminderService = PreviewReminderService()

@@ -12,45 +12,60 @@ struct ConfirmView: View {
 
     @State private var completedDate = Date()
 
-    var confirmAction: ((Date) -> Void)
+    @State private var scheduleNextCleaning = true
+
+    var confirmAction: ((Date, Bool) -> Void)
+
+    var nextScheduleDateFromNow: Date
+
+    var isAutoSchedulingEnabled: Bool
 
     var body: some View {
         VStack(spacing: 16) {
-            HStack {
-                Image(systemName: "clock.badge.checkmark")
-                    .font(.largeTitle)
-                    .foregroundStyle(Color(uiColor: .systemGreen), .primary)
-
-                Text("Completed")
-                    .font(.title)
-            }
-            .padding(.top)
-
             DatePicker(selection: $completedDate) {
-                EmptyView()
             }
             .labelsHidden()
 
             Divider()
 
-            HStack(spacing: 32) {
-                Button(action: {
-                    dismiss()
-                }) {
-                    Text("Cancel")
+            Toggle(isOn: $scheduleNextCleaning) {
+                VStack(alignment: .leading) {
+                    Text("Schedule next cleaning")
+                        .font(.callout)
+                    Text(nextScheduleDateFromNow, format: .dateTime.weekday().month().day().hour())
+                        .foregroundStyle(.secondary)
                 }
-                .buttonStyle(SecondaryButtonStyle())
-
-                Button(action: {
-                    dismiss()
-                    confirmAction(completedDate)
-                }) {
-                    Text("Confirm")
-                }
-                .buttonStyle(PrimaryButtonStyle())
             }
         }
-        .padding(.horizontal, 32)
+        .frame(maxHeight: .infinity, alignment: .top)
+        .padding()
+        .navigationTitle("Mark Complete?")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .cancellationAction) {
+                Button(role: .cancel, action: {
+                    dismiss()
+                }) {
+                    Image(systemName: "xmark")
+                }
+            }
+
+            ToolbarItem(placement: .bottomBar) {
+                Button(role: .confirm, action: {
+                    dismiss()
+                    confirmAction(completedDate, scheduleNextCleaning)
+                }) {
+                    HStack {
+                        Image(systemName: "checkmark.square")
+                        Text("Mark Complete")
+                    }
+                    .padding()
+                }
+            }
+        }
+        .onAppear {
+            scheduleNextCleaning = isAutoSchedulingEnabled
+        }
     }
 }
 
@@ -62,15 +77,20 @@ struct ConfirmView: View {
         Text("Content View")
     }
     .sheet(isPresented: $isPresented) {
-        ConfirmView(confirmAction: { completedDate in })
-            .background {
-                GeometryReader { proxy in
-                    Color.clear
-                        .task {
-                            sheetContentHeight = proxy.size.height
-                        }
+        NavigationStack {
+            ConfirmView(confirmAction: { completedDate, scheduleNextCleaning in },
+                        nextScheduleDateFromNow: Date().addingTimeInterval(86_400 * 2),
+                        isAutoSchedulingEnabled: true)
+                .padding()
+                .background {
+                    GeometryReader { proxy in
+                        Color.clear
+                            .task {
+                                sheetContentHeight = proxy.size.height
+                            }
+                    }
                 }
-            }
-            .presentationDetents([.height(sheetContentHeight)])
+                .presentationDetents([.medium])
+        }
     }
 }

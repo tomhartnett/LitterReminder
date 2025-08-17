@@ -7,9 +7,26 @@
 
 import SwiftUI
 
+extension HomeView {
+    enum HomeViewSheet: Identifiable {
+        case confirmMarkComplete
+        case settings
+
+        var id: Self {
+            self
+        }
+    }
+}
+
 struct HomeView: View {
-    @Environment(ViewModel.self) private var viewModel
-    @State private var showConfirmMarkComplete = false
+    @Environment(AppSettings.self) private var appSettings
+
+    @Environment(\.dependencies) private var dependencies: Dependencies
+
+    @Environment(HomeViewModel.self) private var viewModel
+
+    @State private var sheet: HomeViewSheet?
+
     @State private var sheetContentHeight = CGFloat(0)
 
     var body: some View {
@@ -53,11 +70,6 @@ struct HomeView: View {
                     scrollToBottom(proxy: proxy)
                 }
             }
-
-            Divider()
-
-            actionButton
-                .padding(.vertical)
         }
         .listStyle(.plain)
         .padding(.top)
@@ -73,21 +85,31 @@ struct HomeView: View {
                 Text("An unknown error has occurred.")
             }
         })
-        .sheet(isPresented: $showConfirmMarkComplete) {
-            ConfirmView(confirmAction: { completedDate in
-                withAnimation {
-                    viewModel.markComplete(completedDate)
-                }
-            })
-            .background {
-                GeometryReader { proxy in
-                    Color.clear
-                        .task {
-                            sheetContentHeight = proxy.size.height
-                        }
+        .sheet(item: $sheet) { item in
+            switch item {
+            case .confirmMarkComplete:
+                confirmSheet
+
+            case .settings:
+                settingsSheet
+            }
+        }
+        .toolbar {
+            ToolbarSpacer(.flexible, placement: .bottomBar)
+
+            ToolbarItem(placement: .bottomBar) {
+                actionButton
+            }
+
+            ToolbarSpacer(.flexible, placement: .bottomBar)
+
+            ToolbarItem(placement: .bottomBar) {
+                Button(action: {
+                    sheet = .settings
+                }) {
+                    Image(systemName: "gearshape")
                 }
             }
-            .presentationDetents([.height(sheetContentHeight)])
         }
     }
 
@@ -103,23 +125,53 @@ struct HomeView: View {
     @ViewBuilder
     private var actionButton: some View {
         if !viewModel.hasScheduledCleaning {
-            Button(action: {
+            Button(role: .confirm, action: {
                 Task {
                     withAnimation {
                         viewModel.addCleaning()
                     }
                 }
             }) {
-                Text("Schedule Cleaning")
+                HStack {
+                    Image(systemName: "calendar.badge.clock")
+                    Text("Schedule")
+                }
+                .padding()
             }
-            .buttonStyle(PrimaryButtonStyle())
+
         } else {
-            Button(action: {
-                showConfirmMarkComplete.toggle()
+            Button(role: .confirm, action: {
+                sheet = .confirmMarkComplete
             }) {
-                Text("Mark Complete")
+                HStack {
+                    Image(systemName: "checkmark.square")
+                    Text("Mark Complete")
+                }
+                .padding()
             }
-            .buttonStyle(PrimaryButtonStyle())
+        }
+    }
+
+    @ViewBuilder
+    private var confirmSheet: some View {
+        NavigationStack {
+            ConfirmView(
+                confirmAction: { completedDate, scheduleNextCleaning in
+                    withAnimation {
+                        viewModel.markComplete(completedDate, scheduleNextCleaning: scheduleNextCleaning)
+                    }
+                },
+                nextScheduleDateFromNow: viewModel.nextScheduleDateFromNow,
+                isAutoSchedulingEnabled: appSettings.isAutoScheduleEnabled
+            )
+            .presentationDetents([.medium])
+        }
+    }
+
+    @ViewBuilder
+    private var settingsSheet: some View {
+        NavigationStack {
+            SettingsView(appSettings: appSettings, dependencies: dependencies)
         }
     }
 }
@@ -127,8 +179,9 @@ struct HomeView: View {
 #Preview {
     HomeView()
         .environment(
-            ViewModel(
+            HomeViewModel(
                 dependencies: PreviewDependencies()
             )
         )
+        .environment(AppSettings())
 }

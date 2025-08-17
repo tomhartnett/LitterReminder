@@ -32,8 +32,7 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
             return
         }
 
-        guard let scheduleService = dependencies?.schedulingService,
-              let notificationService = dependencies?.notificationService,
+        guard let notificationService = dependencies?.notificationService,
               let cleaningService = dependencies?.cleaningService else {
             // TODO: log error
             return
@@ -51,20 +50,21 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
         switch response.actionIdentifier {
         case NotificationConstants.markCompleteAction:
             do {
-                try await dependencies?.markCompleteUseCase.execute(for: cleaning, completedDate: .now)
+                // TODO: add setting for scheduleNextCleaning
+                try await dependencies?.markCompleteUseCase.execute(for: cleaning, completedDate: .now, scheduleNextCleaning: true)
             } catch {
                 // TODO: handle error
             }
 
         case NotificationConstants.reminderLaterAction:
             guard let existingDueDate = content.userInfo[NotificationConstants.userInfoDueDate] as? Date,
+                  let newDueDate = Calendar.current.date(byAdding: .day, value: 1, to: existingDueDate),
                   let occurrence = content.userInfo[NotificationConstants.userInfoOccurrence] as? Int else {
                 // TODO: log error
                 break
             }
 
             do {
-                let newDueDate = scheduleService.snoozeCleaningDate(existingDueDate)
                 let newNotificationID = try await notificationService.scheduleNotification(
                     newDueDate,
                     occurrence: occurrence + 1

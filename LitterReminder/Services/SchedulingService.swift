@@ -13,11 +13,6 @@ protocol SchedulingService {
         calendar: Calendar
     ) -> Date
 
-    func nextCleaningDateComponents(
-        _ currentDate: Date,
-        calendar: Calendar
-    ) -> DateComponents
-
     func snoozeCleaningDate(
         _ existingDueDate: Date,
         calendar: Calendar
@@ -29,40 +24,26 @@ extension SchedulingService {
         nextCleaningDate(.now, calendar: .current)
     }
 
-    func nextCleaningDate(after date: Date) -> Date {
-        nextCleaningDate(date, calendar: .current)
-    }
-
-    func nextCleaningDateComponents() -> DateComponents {
-        nextCleaningDateComponents(.now, calendar: .current)
-    }
-
-    func nextCleaningDateComponents(
-        _ currentDate: Date,
-        calendar: Calendar
-    ) -> DateComponents {
-        let scheduledDate = nextCleaningDate(currentDate, calendar: calendar)
-        return scheduledDate.dueDateComponents(calendar)
-    }
-
     func snoozeCleaningDate(_ existingDueDate: Date) -> Date {
         snoozeCleaningDate(existingDueDate, calendar: .current)
     }
 }
 
-extension Date {
-    func dueDateComponents(_ calendar: Calendar = .current) -> DateComponents {
-        calendar.dateComponents([.year, .month, .day, .hour, .minute], from: self)
-    }
-}
-
 final class DefaultSchedulingService: SchedulingService {
+    let appSettings: AppSettings
+
+    init(appSettings: AppSettings) {
+        self.appSettings = appSettings
+    }
+
     func nextCleaningDate(
         _ currentDate: Date,
         calendar: Calendar
     ) -> Date {
-        guard let tempDate = calendar.date(byAdding: .day, value: 2, to: currentDate),
-              let scheduledDate = calendar.date(bySettingHour: 17, minute: 0, second: 0, of: tempDate) else {
+        let daysOut = appSettings.nextCleaningDaysOut
+        let hourOfDay = appSettings.nextCleaningHourOfDay
+        guard let tempDate = calendar.date(byAdding: .day, value: daysOut, to: currentDate),
+              let scheduledDate = calendar.date(bySettingHour: hourOfDay, minute: 0, second: 0, of: tempDate) else {
             fatalError("\(#function): Failed to create next date for currentDate: \(currentDate)")
         }
 
@@ -73,8 +54,10 @@ final class DefaultSchedulingService: SchedulingService {
         _ existingDueDate: Date,
         calendar: Calendar
     ) -> Date {
-        guard let tempDate = calendar.date(byAdding: .day, value: 1, to: existingDueDate),
-              let newDueDate = calendar.date(bySettingHour: 17, minute: 0, second: 0, of: tempDate) else {
+        let daysOut = appSettings.nextCleaningDaysOut
+        let hourOfDay = appSettings.nextCleaningHourOfDay
+        guard let tempDate = calendar.date(byAdding: .day, value: daysOut, to: existingDueDate),
+              let newDueDate = calendar.date(bySettingHour: hourOfDay, minute: 0, second: 0, of: tempDate) else {
             fatalError("\(#function): Failed to snooze existing existingDueDate: \(existingDueDate)")
         }
 

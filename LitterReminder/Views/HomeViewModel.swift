@@ -1,5 +1,5 @@
 //
-//  ContentView+ViewModel.swift
+//  HomeViewModel.swift
 //  LitterReminder
 //
 //  Created by Tom Hartnett on 11/24/24.
@@ -9,7 +9,8 @@ import EventKit
 import SwiftData
 import SwiftUI
 
-@Observable class ViewModel {
+@Observable
+final class HomeViewModel {
     var currentDate: Date
 
     var errorMessage: String?
@@ -44,9 +45,13 @@ import SwiftUI
             .first
     }
 
-    private var eventStore: EKEventStore
+    var nextScheduleDateFromNow: Date {
+        dependencies.schedulingService.nextCleaningDate()
+    }
 
-    let dependencies: Dependencies
+    private let eventStore: EKEventStore
+
+    private let dependencies: Dependencies
 
     init(
         dependencies: Dependencies,
@@ -82,27 +87,18 @@ import SwiftUI
         }
     }
 
-    func markComplete(_ currentDate: Date = .now) {
+    func markComplete(_ currentDate: Date = .now, scheduleNextCleaning: Bool) {
         guard let scheduledCleaning else {
             return
         }
 
         Task {
             do {
-                try await dependencies.markCompleteUseCase.execute(for: scheduledCleaning, completedDate: currentDate)
+                try await dependencies.markCompleteUseCase.execute(for: scheduledCleaning, completedDate: currentDate, scheduleNextCleaning: scheduleNextCleaning)
                 fetchData()
             } catch {
                 // TODO: handle error
             }
-        }
-    }
-
-    func requestAuthorization() {
-        dependencies.reminderService.requestRemindersAccess()
-
-        Task {
-            // TODO: handle error
-            try await dependencies.notificationService.requestAuthorization()
         }
     }
 

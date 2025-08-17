@@ -11,22 +11,29 @@ import SwiftUI
 @main
 struct LitterReminderApp: App {
     @UIApplicationDelegateAdaptor private var appDelegate: AppDelegate
+
     @Environment(\.scenePhase) private var scenePhase
+
+    @State var appSettings: AppSettings
+
     let container: ModelContainer
-    let viewModel: ViewModel
-    let dependencies: Dependencies
+
+    let homeViewModel: HomeViewModel
+
+    let dependencies: AppDependencies
 
     var body: some Scene {
         WindowGroup {
             ContentView()
-                .environment(viewModel)
+                .environment(appSettings)
+                .environment(homeViewModel)
+                .environment(\.dependencies, dependencies)
         }
         .modelContainer(container)
         .onChange(of: scenePhase) { _, newValue in
             if newValue == .active {
-                viewModel.fetchData()
-                viewModel.updateCurrentDate()
-                viewModel.requestAuthorization()
+                homeViewModel.fetchData()
+                homeViewModel.updateCurrentDate()
             }
         }
     }
@@ -38,17 +45,22 @@ struct LitterReminderApp: App {
                 migrationPlan: CleaningMigrationPlan.self
             )
 
+            let appSettings = AppSettings()
+            _appSettings = State(wrappedValue: appSettings)
+
             dependencies = AppDependencies(
+                appSettings: appSettings,
                 cleaningService: DefaultCleaningService(modelContext: container.mainContext),
                 notificationService: DefaultNotificationService(),
                 reminderService: DefaultReminderService(),
-                schedulingService: DefaultSchedulingService()
+                schedulingService: DefaultSchedulingService(appSettings: appSettings)
             )
 
-            viewModel = ViewModel(dependencies: dependencies)
+            homeViewModel = HomeViewModel(dependencies: dependencies)
 
             appDelegate.dependencies = dependencies
             appDelegate.modelContainer = container
+
         } catch {
             fatalError("Failed to create dependencies or ViewModel.")
         }
