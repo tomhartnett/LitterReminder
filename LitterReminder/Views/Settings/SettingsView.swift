@@ -30,44 +30,37 @@ struct SettingsView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            HStack {
-                Text("Schedule Settings")
-                    .fontWeight(.medium)
-                    .fixedSize(horizontal: false, vertical: true)
-
-                Spacer()
-
-                Text(nextCleaningDate, format: .dateTime.weekday().month().day().hour())
-                    .font(.callout)
-                    .foregroundStyle(.secondary)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
+            Text("Next cleaning schedule")
+                .fontWeight(.medium)
+                .fixedSize(horizontal: false, vertical: true)
 
             Stepper(value: $appSettings.nextCleaningDaysOut, in: 1...7) {
                 HStack {
-                    Text("Days from now:")
+                    Text("\(appSettings.nextCleaningDaysOut)")
+                        .monospaced()
+
+                    Text("days from now")
                         .foregroundStyle(.secondary)
                         .fixedSize(horizontal: false, vertical: true)
 
                     Spacer()
-
-                    Text("\(appSettings.nextCleaningDaysOut)")
-                        .monospaced()
                 }
             }
 
             Stepper(value: $appSettings.nextCleaningHourOfDay, in: 0...23) {
                 HStack {
-                    Text("Time of day:")
+                    Text("at")
                         .foregroundStyle(.secondary)
                         .fixedSize(horizontal: false, vertical: true)
-
-                    Spacer()
 
                     Text("\(formatHour())")
                         .monospaced()
                 }
             }
+
+            Text("Example from now: \(nextCleaningDate.formatted(.dateTime.weekday().month().day().hour()))")
+                .font(.callout)
+                .foregroundStyle(.secondary)
 
             Divider()
 
@@ -120,16 +113,9 @@ struct SettingsView: View {
         }
         .frame(maxHeight: .infinity, alignment: .top)
         .padding()
+        .navigationTitle("Settings")
+        .navigationBarTitleDisplayMode(.inline)
         .toolbar {
-            ToolbarSpacer(.flexible, placement: .topBarTrailing)
-            ToolbarItem(placement: .primaryAction) {
-                Button(role: .confirm, action: {
-                    dismiss()
-                }) {
-                    Image(systemName: "checkmark")
-                }
-            }
-
             ToolbarItem(placement: .bottomBar) {
                 Button(role: .confirm, action: {
                     dismiss()
@@ -169,8 +155,6 @@ struct SettingsView: View {
         )
         .onAppear {
             buildDate()
-
-            viewModel.isNotificationsEnabled = appSettings.isNotificationsEnabled
         }
         .onChange(of: appSettings.nextCleaningDaysOut) { _, _ in
             buildDate()

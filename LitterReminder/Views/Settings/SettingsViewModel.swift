@@ -18,7 +18,6 @@ final class SettingsViewModel {
     private let appSettings: AppSettings
     private let dependencies: Dependencies
 
-    // TODO: need to check status of reminders & notifications authorization
     init(
         appSettings: AppSettings,
         dependencies: Dependencies
@@ -27,7 +26,6 @@ final class SettingsViewModel {
         self.dependencies = dependencies
 
         // Confirm permissions haven't changed (in Settings) since app launched.
-
         let isRemindersPermissionGranted = dependencies.reminderService.isPermissionGranted
         isRemindersEnabled = isRemindersPermissionGranted
         appSettings.isRemindersEnabled = isRemindersPermissionGranted
