@@ -40,17 +40,30 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
 
         let existingNotificationID = response.notification.request.identifier
 
-        guard let cleaning = try? cleaningService.fetchAllCleanings().first(where: {
-            $0.notificationID == existingNotificationID
-        }) else {
+        guard let cleaning = try? cleaningService
+            .fetchAllCleanings()
+            .first(where: { $0.notificationID == existingNotificationID }) else {
             // TODO: log error
+            return
+        }
+
+        guard !cleaning.isComplete else {
+            // It's possible the cleaning was already completed in the app,
+            // and then the user later marked complete on the notification.
+            // In that case, there's no work to do, and it's not an error.
+            // TODO: maybe log something
             return
         }
 
         switch response.actionIdentifier {
         case NotificationConstants.markCompleteAction:
             do {
-                try await dependencies?.markCompleteUseCase.execute(for: cleaning, completedDate: .now, scheduleNextCleaning: true)
+                let scheduleNextCleaning = dependencies?.appSettings.isAutoScheduleEnabled ?? false
+                try await dependencies?.markCompleteUseCase.execute(
+                    for: cleaning,
+                    completedDate: .now,
+                    scheduleNextCleaning: scheduleNextCleaning
+                )
             } catch {
                 // TODO: handle error
             }
