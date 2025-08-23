@@ -155,15 +155,11 @@ struct HomeView: View {
     @ViewBuilder
     private var confirmSheet: some View {
         NavigationStack {
-            ConfirmView(
-                confirmAction: { completedDate, scheduleNextCleaning in
-                    withAnimation {
-                        viewModel.markComplete(completedDate, scheduleNextCleaning: scheduleNextCleaning)
-                    }
-                },
-                nextScheduleDateFromNow: viewModel.nextScheduleDateFromNow,
-                isAutoSchedulingEnabled: appSettings.isAutoScheduleEnabled
-            )
+            ConfirmView() { completedDate, scheduleNextCleaning in
+                withAnimation {
+                    viewModel.markComplete(completedDate, scheduleNextCleaning: scheduleNextCleaning)
+                }
+            }
             .presentationDetents([.medium])
         }
     }

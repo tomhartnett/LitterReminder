@@ -167,11 +167,13 @@ struct SettingsView: View {
     func buildDate() {
         let calendar = Calendar.current
         let date = calendar.date(byAdding: .day, value: appSettings.nextCleaningDaysOut, to: Date())!
+        // FIXME: could potentially crash when springing forward for DST
         let dateWithHour = calendar.date(bySettingHour: appSettings.nextCleaningHourOfDay, minute: 0, second: 0, of: date)!
         nextCleaningDate = dateWithHour
     }
 
     func formatHour() -> String {
+        // FIXME: could potentially crash when springing forward for DST
         let date = Calendar.current.date(bySettingHour: appSettings.nextCleaningHourOfDay, minute: 0, second: 0, of: Date())!
         return date.formatted(date: .omitted, time: .standard)
     }
