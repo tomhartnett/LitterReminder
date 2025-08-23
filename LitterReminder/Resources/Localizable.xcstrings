@@ -1,0 +1,81 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "%@" : {
+
+    },
+    "%lld" : {
+
+    },
+    "A notification will be sent when it's time to clean the litter box." : {
+
+    },
+    "A reminder will be added to the Reminders app." : {
+
+    },
+    "An unknown error has occurred." : {
+
+    },
+    "at" : {
+
+    },
+    "Automatic scheduling" : {
+
+    },
+    "Automatically schedule the next cleaning when one is marked complete." : {
+
+    },
+    "Cancel" : {
+
+    },
+    "Date" : {
+
+    },
+    "days from now" : {
+
+    },
+    "Delete" : {
+
+    },
+    "Done" : {
+
+    },
+    "Error" : {
+
+    },
+    "Example from now: %@" : {
+
+    },
+    "Litter Reminder" : {
+
+    },
+    "Mark Complete" : {
+
+    },
+    "Mark Complete?" : {
+
+    },
+    "Next cleaning schedule" : {
+
+    },
+    "OK" : {
+
+    },
+    "Permission Needed" : {
+
+    },
+    "Schedule" : {
+
+    },
+    "Schedule next cleaning" : {
+
+    },
+    "Settings" : {
+
+    },
+    "Time" : {
+
+    }
+  },
+  "version" : "1.1"
+}
