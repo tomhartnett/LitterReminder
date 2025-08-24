@@ -69,6 +69,7 @@ final class DefaultCleaningService: CleaningService {
         reminderID: String?
     ) throws -> String {
         let cleaning = Cleaning(
+            identifier: UUID().uuidString,
             createdDate: currentDate,
             scheduledDate: scheduledDate,
             notificationID: notificationID,
@@ -111,6 +112,7 @@ final class DefaultCleaningService: CleaningService {
 final class PreviewCleaningService: CleaningService {
     func getScheduledCleaning() throws -> Cleaning? {
         return Cleaning(
+            identifier: UUID().uuidString,
             createdDate: Date().addingTimeInterval(-86_400),
             scheduledDate: Date().addingTimeInterval(86_400),
             completedDate: nil,

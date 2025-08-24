@@ -42,11 +42,23 @@ enum CleaningMigrationPlan: SchemaMigrationPlan {
         }
     )
 
+    static let migrateV2toV3 = MigrationStage.lightweight(
+        fromVersion: CleaningSchemaV2.self,
+        toVersion: CleaningSchemaV3.self
+    )
+
     static var schemas: [any VersionedSchema.Type] {
-        [CleaningSchemaV1.self, CleaningSchemaV2.self]
+        [
+            CleaningSchemaV1.self,
+            CleaningSchemaV2.self,
+            CleaningSchemaV3.self
+        ]
     }
 
     static var stages: [MigrationStage] {
-        [migrateV1toV2]
+        [
+            migrateV1toV2,
+            migrateV2toV3
+        ]
     }
 }

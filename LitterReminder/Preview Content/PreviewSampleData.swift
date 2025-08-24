@@ -28,46 +28,55 @@ let previewContainer: ModelContainer = {
 struct SampleCleaningsList {
     static var contents: [Cleaning] = [
         Cleaning(
+            identifier: UUID().uuidString,
             createdDate: .now.addingTimeInterval(-1),
             scheduledDate: .now.addingTimeInterval(3600 * 48),
             completedDate: nil
         ),
         Cleaning(
+            identifier: UUID().uuidString,
             createdDate: .now.addingTimeInterval(-2),
             scheduledDate: .now.addingTimeInterval(3600 * 8),
             completedDate: nil
         ),
         Cleaning(
+            identifier: UUID().uuidString,
             createdDate: .now.addingTimeInterval(-3),
             scheduledDate: .now,
             completedDate: nil
         ),
         Cleaning(
+            identifier: UUID().uuidString,
             createdDate: .now.addingTimeInterval(-4),
             scheduledDate: .now.addingTimeInterval(-300),
             completedDate: nil
         ),
         Cleaning(
+            identifier: UUID().uuidString,
             createdDate: .now.addingTimeInterval(-5),
             scheduledDate: .now.addingTimeInterval(-3600),
             completedDate: nil
         ),
         Cleaning(
+            identifier: UUID().uuidString,
             createdDate: .now.addingTimeInterval(-6),
             scheduledDate: .now.addingTimeInterval(-3600 * 3),
             completedDate: nil
         ),
         Cleaning(
+            identifier: UUID().uuidString,
             createdDate: .now.addingTimeInterval(-7),
             scheduledDate: .now.addingTimeInterval(-3600 * 3),
             completedDate: .now.addingTimeInterval(-3600 * 1.5)
         ),
         Cleaning(
+            identifier: UUID().uuidString,
             createdDate: .now.addingTimeInterval(-8),
             scheduledDate: .now.addingTimeInterval(-3600 * 3),
             completedDate: .now.addingTimeInterval(-3600 * 24)
         ),
         Cleaning(
+            identifier: UUID().uuidString,
             createdDate: .now.addingTimeInterval(-9),
             scheduledDate: .now.addingTimeInterval(-3600 * 3),
             completedDate: .now.addingTimeInterval(-3600 * 48)
