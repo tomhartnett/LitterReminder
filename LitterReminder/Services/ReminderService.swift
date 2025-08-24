@@ -25,11 +25,11 @@ enum ReminderServiceError: Error, LocalizedError {
     var errorDescription: String? {
         switch self {
         case .calendarNotFound:
-            return "Could not retrieve the Reminders calendar from the system."
+            return String(localized: "Could not retrieve the Reminders calendar from the system.")
         case .failedToRemove(let error):
-            return "Could not remove reminder from the system".appendingError(error)
+            return String(localized: "Could not remove reminder from the system").appendingError(error)
         case .failedToSave(let error):
-            return "Could not save reminder to the system".appendingError(error)
+            return String(localized: "Could not save reminder to the system").appendingError(error)
         case .permissionsError(let message, _):
             return message
         }
@@ -63,7 +63,7 @@ final class DefaultReminderService: ReminderService {
         }
 
         let reminder = EKReminder(eventStore: eventStore)
-        reminder.title = "Scoop the poop"
+        reminder.title = String(localized: "Scoop the poop")
         reminder.calendar = calendar
         reminder.dueDateComponents = dueDate.dueDateComponents()
         reminder.addAlarm(EKAlarm(absoluteDate: dueDate))
@@ -111,12 +111,12 @@ final class DefaultReminderService: ReminderService {
 
         case .restricted:
             throw ReminderServiceError.permissionsError(
-                "Reminders access is restricted on this device.",
+                String(localized: "Reminders access is restricted on this device."),
                 false
             )
         case .denied:
             throw ReminderServiceError.permissionsError(
-                "Reminders access was previously denied. Go to Settings to allow it.",
+                String(localized: "Reminders access was previously denied. Go to Settings to allow it."),
                 true
             )
         case .fullAccess:
@@ -125,13 +125,13 @@ final class DefaultReminderService: ReminderService {
         case .writeOnly:
             // Should never happen
             throw ReminderServiceError.permissionsError(
-                "Reminders access is write-only on this device. This is insufficient for this feature.",
+                String(localized: "Reminders access is write-only on this device. This is insufficient for this feature."),
                 false
             )
 
         @unknown default:
             throw ReminderServiceError.permissionsError(
-                "An unknown Reminders authorization status has been encountered.",
+                String(localized: "An unknown Reminders authorization status has been encountered."),
                 false
             )
         }

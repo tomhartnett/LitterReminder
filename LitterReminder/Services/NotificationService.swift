@@ -31,7 +31,7 @@ enum NotificationServiceError: Error, LocalizedError {
     var errorDescription: String? {
         switch self {
         case .failedToAdd(let error):
-            return "Could not add notification to the system".appendingError(error)
+            return String(localized: "Could not add notification to the system").appendingError(error)
         case .permissionsError(let message, _):
             return message
         }
@@ -69,8 +69,14 @@ final class DefaultNotificationService: NotificationService {
     }
 
     func registerNotifications() {
-        let markCompleteAction = UNNotificationAction(identifier: NotificationConstants.markCompleteAction, title: "Mark Complete")
-        let remindLaterAction = UNNotificationAction(identifier: NotificationConstants.reminderLaterAction, title: "Remind Me Tomorrow")
+        let markCompleteAction = UNNotificationAction(
+            identifier: NotificationConstants.markCompleteAction,
+            title: String(localized: "Mark Complete")
+        )
+        let remindLaterAction = UNNotificationAction(
+            identifier: NotificationConstants.reminderLaterAction,
+            title: String(localized: "Remind Me Tomorrow")
+        )
         let scheduledCleaningCategory = UNNotificationCategory(
             identifier: NotificationConstants.categoryIdentifier,
             actions: [markCompleteAction, remindLaterAction],
@@ -92,7 +98,7 @@ final class DefaultNotificationService: NotificationService {
 
         case .denied:
             throw NotificationServiceError.permissionsError(
-                "Notifications were previously denied. Go to Settings to allow it.",
+                String(localized: "Notifications were previously denied. Go to Settings to allow it."),
                 true
             )
         case .authorized:
@@ -106,7 +112,7 @@ final class DefaultNotificationService: NotificationService {
 
         @unknown default:
             throw NotificationServiceError.permissionsError(
-                "An unknown Notifications authorization status has been encountered.",
+                String(localized: "An unknown Notifications authorization status has been encountered."),
                 false
             )
         }
@@ -114,7 +120,7 @@ final class DefaultNotificationService: NotificationService {
 
     func scheduleNotification(_ dueDate: Date, occurrence: Int) async throws -> String {
         let content = UNMutableNotificationContent()
-        content.title = "Litter Reminder"
+        content.title = String(localized: "Litter Reminder")
         content.body = messageForNotification(occurrence)
         content.userInfo[NotificationConstants.userInfoDueDate] = dueDate
         content.userInfo[NotificationConstants.userInfoOccurrence] = occurrence
@@ -140,13 +146,13 @@ final class DefaultNotificationService: NotificationService {
 
     private func messageForNotification(_ occurrence: Int) -> String {
         if occurrence <= 1 {
-            return "The litter box is due for cleaning"
+            return String(localized: "The litter box is due for cleaning")
         } else if occurrence == 2 {
-            return "2nd Notification: The litter box is due for cleaning"
+            return String(localized: "2nd Notification: The litter box is due for cleaning")
         } else if occurrence == 3 {
-            return "3rd Notification 🙀: The litter box is due for cleaning"
+            return String(localized: "3rd Notification 🙀: The litter box is due for cleaning")
         } else {
-            return "😿 The litter box is way overdue for cleaning 🙀"
+            return String(localized: "😿 The litter box is way overdue for cleaning 🙀")
         }
     }
 }

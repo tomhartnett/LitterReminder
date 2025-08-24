@@ -79,7 +79,7 @@ struct SettingsView: View {
 
             PermissionToggle(
                 isOn: .constant(viewModel.isNotificationsEnabled),
-                label: "Notifications",
+                label: String(localized: "Notifications"),
                 attemptToEnable: {
                     Task {
                         await viewModel.enableNotifications()
@@ -97,7 +97,7 @@ struct SettingsView: View {
 
             PermissionToggle(
                 isOn: .constant(viewModel.isRemindersEnabled),
-                label: "Reminders",
+                label: String(localized: "Reminders"),
                 attemptToEnable: {
                     viewModel.enableReminders()
                 },
