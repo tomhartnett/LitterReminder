@@ -7,6 +7,15 @@
     "%lld" : {
 
     },
+    "😿 The litter box is way overdue for cleaning 🙀" : {
+
+    },
+    "2nd Notification: The litter box is due for cleaning" : {
+
+    },
+    "3rd Notification 🙀: The litter box is due for cleaning" : {
+
+    },
     "A notification will be sent when it's time to clean the litter box." : {
 
     },
@@ -14,6 +23,12 @@
 
     },
     "An unknown error has occurred." : {
+
+    },
+    "An unknown Notifications authorization status has been encountered." : {
+
+    },
+    "An unknown Reminders authorization status has been encountered." : {
 
     },
     "at" : {
@@ -26,6 +41,27 @@
 
     },
     "Cancel" : {
+
+    },
+    "Cleaning is due" : {
+
+    },
+    "Cleaning is overdue" : {
+
+    },
+    "Cleaning scheduled" : {
+
+    },
+    "Could not add notification to the system" : {
+
+    },
+    "Could not remove reminder from the system" : {
+
+    },
+    "Could not retrieve the Reminders calendar from the system." : {
+
+    },
+    "Could not save reminder to the system" : {
 
     },
     "Date" : {
@@ -58,10 +94,31 @@
     "Next cleaning schedule" : {
 
     },
+    "Notifications" : {
+      "generatesSymbol" : false
+    },
+    "Notifications were previously denied. Go to Settings to allow it." : {
+
+    },
     "OK" : {
 
     },
     "Permission Needed" : {
+
+    },
+    "Remind Me Tomorrow" : {
+
+    },
+    "Reminders" : {
+
+    },
+    "Reminders access is restricted on this device." : {
+
+    },
+    "Reminders access is write-only on this device. This is insufficient for this feature." : {
+
+    },
+    "Reminders access was previously denied. Go to Settings to allow it." : {
 
     },
     "Schedule" : {
@@ -70,7 +127,13 @@
     "Schedule next cleaning" : {
 
     },
+    "Scoop the poop" : {
+
+    },
     "Settings" : {
+
+    },
+    "The litter box is due for cleaning" : {
 
     },
     "Time" : {

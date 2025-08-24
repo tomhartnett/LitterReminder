@@ -92,7 +92,7 @@ extension CleaningView {
                 self.init(
                     imageSystemName: "clock",
                     badgeColor: .label,
-                    title: "Cleaning scheduled",
+                    title: String(localized: "Cleaning scheduled"),
                     subtitle1: scheduledDate.formattedString(),
                     subtitle2: scheduledDate.relativeFormattedString(),
                     showDivider: showDivider
@@ -103,7 +103,7 @@ extension CleaningView {
                     self.init(
                         imageSystemName: "clock.badge",
                         badgeColor: .systemOrange,
-                        title: "Cleaning is due",
+                        title: String(localized: "Cleaning is due"),
                         subtitle1: scheduledDate.formattedString(),
                         subtitle2: scheduledDate.relativeFormattedString(),
                         showDivider: showDivider
@@ -112,7 +112,7 @@ extension CleaningView {
                     self.init(
                         imageSystemName: "clock.badge.exclamationmark",
                         badgeColor: .systemRed,
-                        title: "Cleaning is overdue",
+                        title: String(localized: "Cleaning is overdue"),
                         subtitle1: scheduledDate.formattedString(),
                         subtitle2: scheduledDate.relativeFormattedString(),
                         showDivider: showDivider
