@@ -64,9 +64,16 @@ final class AppDependencies: Dependencies {
             schedulingService: schedulingService
         )
 
-        appSettings.isRemindersEnabled = reminderService.isPermissionGranted
-        Task {
-            appSettings.isNotificationsEnabled = await notificationService.isPermissionGranted
+        let isRemindersPermissionGranted = reminderService.isPermissionGranted
+        if !isRemindersPermissionGranted {
+            appSettings.isRemindersEnabled = false
+        }
+
+        Task { @MainActor in
+            let isNotificationsPermissionGranted = await notificationService.isPermissionGranted
+            if !isNotificationsPermissionGranted {
+                appSettings.isNotificationsEnabled = false
+            }
         }
     }
 }

@@ -27,21 +27,29 @@ final class SettingsViewModel {
 
         // Confirm permissions haven't changed (in Settings) since app launched.
         let isRemindersPermissionGranted = dependencies.reminderService.isPermissionGranted
-        isRemindersEnabled = isRemindersPermissionGranted
-        appSettings.isRemindersEnabled = isRemindersPermissionGranted
+        if isRemindersPermissionGranted {
+            isRemindersEnabled = appSettings.isRemindersEnabled
+        } else {
+            isRemindersEnabled = false
+            appSettings.isRemindersEnabled = false
+        }
 
         // Have to set it before the Task
         isNotificationsEnabled = false
-        Task {
+        Task { @MainActor in
             let isNotificationsPermissionGranted = await dependencies.notificationService.isPermissionGranted
-            isNotificationsEnabled = isNotificationsPermissionGranted
-            appSettings.isNotificationsEnabled = isNotificationsPermissionGranted
+            if isNotificationsPermissionGranted {
+                isNotificationsEnabled = appSettings.isNotificationsEnabled
+            } else {
+                isNotificationsEnabled = false
+                appSettings.isNotificationsEnabled = false
+            }
         }
     }
 
     func enableNotifications() async {
         isNotificationsEnabled = true
-        Task {
+        Task { @MainActor in
             do {
                 let isGranted = try await dependencies.notificationService.requestAuthorization()
                 isNotificationsEnabled = isGranted
@@ -65,7 +73,7 @@ final class SettingsViewModel {
 
     func enableReminders() {
         isRemindersEnabled = true
-        Task {
+        Task { @MainActor in
             do {
                 let isGranted = try await dependencies.reminderService.requestRemindersAccess()
                 isRemindersEnabled = isGranted

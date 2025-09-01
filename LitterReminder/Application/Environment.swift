@@ -7,13 +7,6 @@
 
 import SwiftUI
 
-private struct DependenciesKey: EnvironmentKey {
-    static let defaultValue: Dependencies = PreviewDependencies()
-}
-
 extension EnvironmentValues {
-    var dependencies: Dependencies {
-        get { self[DependenciesKey.self] }
-        set { self[DependenciesKey.self] = newValue }
-    }
+    @Entry var dependencies: Dependencies = PreviewDependencies()
 }

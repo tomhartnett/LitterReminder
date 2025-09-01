@@ -14,45 +14,51 @@ class AppSettings {
 
     init(storage: UserDefaults = UserDefaults.standard) {
         self.storage = storage
-        loadSettings()
     }
 
-    var nextCleaningHourOfDay: Int = 0 {
-        didSet {
-            saveSetting(nextCleaningHourOfDay, key: .nextCleaningHourOfDay)
+    var nextCleaningHourOfDay: Int {
+        get {
+            getSetting(.nextCleaningHourOfDay) ?? 17
+        }
+        set {
+            saveSetting(newValue, key: .nextCleaningHourOfDay)
         }
     }
 
-    var nextCleaningDaysOut: Int = 0 {
-        didSet {
-            saveSetting(nextCleaningDaysOut, key: .nextCleaningDaysOut)
+    var nextCleaningDaysOut: Int {
+        get {
+            getSetting(.nextCleaningDaysOut) ?? 2
+        }
+        set {
+            saveSetting(newValue, key: .nextCleaningDaysOut)
         }
     }
 
-    var isAutoScheduleEnabled: Bool = false {
-        didSet {
-            saveSetting(isAutoScheduleEnabled, key: .isAutoScheduleEnabled)
+    var isAutoScheduleEnabled: Bool {
+        get {
+            getSetting(.isAutoScheduleEnabled) ?? true
+        }
+        set {
+            saveSetting(newValue, key: .isAutoScheduleEnabled)
         }
     }
 
-    var isNotificationsEnabled: Bool = false {
-        didSet {
-            saveSetting(isNotificationsEnabled, key: .isNotificationsEnabled)
+    var isNotificationsEnabled: Bool {
+        get {
+            getSetting(.isNotificationsEnabled) ?? false
+        }
+        set {
+            saveSetting(newValue, key: .isNotificationsEnabled)
         }
     }
 
-    var isRemindersEnabled: Bool = false {
-        didSet {
-            saveSetting(isRemindersEnabled, key: .isRemindersEnabled)
+    var isRemindersEnabled: Bool {
+        get {
+            getSetting(.isRemindersEnabled) ?? false
         }
-    }
-
-    private func loadSettings() {
-        isAutoScheduleEnabled = getSetting(.isAutoScheduleEnabled) ?? true
-        isNotificationsEnabled = getSetting(.isNotificationsEnabled) ?? false
-        isRemindersEnabled = getSetting(.isRemindersEnabled) ?? false
-        nextCleaningHourOfDay = getSetting(.nextCleaningHourOfDay) ?? 17
-        nextCleaningDaysOut = getSetting(.nextCleaningDaysOut) ?? 2
+        set {
+            saveSetting(newValue, key: .isRemindersEnabled)
+        }
     }
 
     private func getSetting<T>(_ key: StorageKey) -> T? {
