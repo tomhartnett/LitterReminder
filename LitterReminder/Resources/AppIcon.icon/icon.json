@@ -16,11 +16,11 @@
             },
             {
               "appearance" : "dark",
-              "value" : 0.8
+              "value" : 1
             },
             {
               "appearance" : "tinted",
-              "value" : 0.8
+              "value" : 1
             }
           ]
         }
