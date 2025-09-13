@@ -49,8 +49,6 @@ final class HomeViewModel {
         dependencies.schedulingService.nextCleaningDate()
     }
 
-    private let eventStore: EKEventStore
-
     private let dependencies: Dependencies
 
     init(
@@ -59,12 +57,11 @@ final class HomeViewModel {
     ) {
         self.dependencies = dependencies
         self.currentDate = currentDate
-        self.eventStore = EKEventStore()
         fetchData()
     }
 
     func addCleaning(_ currentDate: Date = .now) {
-        Task {
+        Task { @MainActor in
             do {
                 try await dependencies.addCleaningUseCase.execute(currentDate: currentDate)
                 fetchData()
@@ -94,7 +91,11 @@ final class HomeViewModel {
 
         Task {
             do {
-                try await dependencies.markCompleteUseCase.execute(for: scheduledCleaning, completedDate: currentDate, scheduleNextCleaning: scheduleNextCleaning)
+                try await dependencies.markCompleteUseCase.execute(
+                    for: scheduledCleaning,
+                    completedDate: currentDate,
+                    scheduleNextCleaning: scheduleNextCleaning
+                )
                 fetchData()
             } catch {
                 // TODO: handle error

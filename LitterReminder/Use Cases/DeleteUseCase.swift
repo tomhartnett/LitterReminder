@@ -26,6 +26,7 @@ final class DefaultDeleteUseCase: DeleteUseCase {
         self.notificationService = notificationService
     }
 
+    @MainActor
     func execute(_ cleaning: Cleaning) {
         if let reminderID = cleaning.reminderID {
             // TODO: handle error

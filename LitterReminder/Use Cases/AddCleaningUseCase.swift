@@ -32,6 +32,7 @@ final class DefaultAddCleaningUseCase: AddCleaningUseCase {
         self.schedulingService = schedulingService
     }
 
+    @MainActor
     func execute(currentDate: Date) async throws {
         let scheduledDate = schedulingService.nextCleaningDate()
 

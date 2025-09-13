@@ -25,6 +25,7 @@ final class DefaultMarkCompleteUseCase: MarkCompleteUseCase {
         self.schedulingService = schedulingService
     }
 
+    @MainActor
     func execute(for cleaning: Cleaning, completedDate: Date, scheduleNextCleaning: Bool) async throws {
         // Mark the current cleaning as complete
         try cleaningService.markComplete(cleaning, completedDate: completedDate)

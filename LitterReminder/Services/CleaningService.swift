@@ -75,14 +75,11 @@ final class DefaultCleaningService: CleaningService {
             notificationID: notificationID,
             reminderID: reminderID
         )
+        modelContext.insert(cleaning)
 
-        let identifier = cleaning.identifier
+        try modelContext.save()
 
-        let executor = DefaultSerialModelExecutor(modelContext: modelContext)
-        executor.modelContext.insert(cleaning)
-        try executor.modelContext.save()
-
-        return identifier
+        return cleaning.identifier
     }
     
     func markComplete(_ cleaning: Cleaning, completedDate: Date) throws {
