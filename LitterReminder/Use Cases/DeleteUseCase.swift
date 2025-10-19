@@ -28,20 +28,13 @@ final class DefaultDeleteUseCase: DeleteUseCase {
 
     @MainActor
     func execute(_ cleaning: Cleaning) {
-        if let reminderID = cleaning.reminderID {
-            // TODO: handle error
-            try? reminderService.deleteReminder(reminderID)
-        }
+        // TODO: handle error
+        try? reminderService.deleteReminder(cleaning.reminderID)
 
-        if let notificationID = cleaning.notificationID {
-            notificationService.deleteNotification(notificationID)
-        }
+        notificationService.deleteNotification(cleaning.notificationID)
 
-        do {
-            try cleaningService.deleteCleaning(cleaning)
-        } catch {
-            // TODO: handle error
-        }
+        // TODO: handle error
+        try? cleaningService.deleteCleaning(cleaning)
     }
 }
 

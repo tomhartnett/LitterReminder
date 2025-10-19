@@ -11,8 +11,8 @@ import Foundation
 protocol ReminderService {
     var isPermissionGranted: Bool { get }
     func addReminder(_ dueDate: Date) throws -> String
-    func completeReminder(_ identifier: String, completionDate: Date) throws
-    func deleteReminder(_ identifier: String) throws
+    func completeReminder(_ identifier: String?, completionDate: Date?) throws
+    func deleteReminder(_ identifier: String?) throws
     func requestRemindersAccess() async throws -> Bool
 }
 
@@ -76,8 +76,9 @@ final class DefaultReminderService: ReminderService {
         }
     }
 
-    func completeReminder(_ identifier: String, completionDate: Date) throws {
-        guard let reminder = eventStore.calendarItem(withIdentifier: identifier) as? EKReminder else {
+    func completeReminder(_ identifier: String?, completionDate: Date?) throws {
+        guard let identifier,
+              let reminder = eventStore.calendarItem(withIdentifier: identifier) as? EKReminder else {
             return
         }
 
@@ -91,8 +92,9 @@ final class DefaultReminderService: ReminderService {
         }
     }
 
-    func deleteReminder(_ identifier: String) throws {
-        guard let reminder = eventStore.calendarItem(withIdentifier: identifier) as? EKReminder else {
+    func deleteReminder(_ identifier: String?) throws {
+        guard let identifier,
+              let reminder = eventStore.calendarItem(withIdentifier: identifier) as? EKReminder else {
             return
         }
 
@@ -147,9 +149,9 @@ final class PreviewReminderService: ReminderService {
         UUID().uuidString
     }
     
-    func completeReminder(_ identifier: String, completionDate: Date) throws {}
+    func completeReminder(_ identifier: String?, completionDate: Date?) throws {}
 
-    func deleteReminder(_ identifier: String) throws {}
+    func deleteReminder(_ identifier: String?) throws {}
 
     func requestRemindersAccess() async throws -> Bool {
         true

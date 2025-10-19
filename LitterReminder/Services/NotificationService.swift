@@ -10,8 +10,9 @@ import UserNotifications
 
 protocol NotificationService {
     var isPermissionGranted: Bool { get async }
-    func deleteNotification(_ identifier: String)
+    func deleteNotification(_ identifier: String?)
     func registerNotifications()
+    func removeAppBadge()
     func requestAuthorization() async throws -> Bool
     func scheduleNotification(_ dueDate: Date, occurrence: Int) async throws -> String
 }
@@ -88,6 +89,10 @@ final class DefaultNotificationService: NotificationService {
         center.setNotificationCategories([scheduledCleaningCategory])
     }
 
+    func removeAppBadge() {
+        center.setBadgeCount(0)
+    }
+
     func requestAuthorization() async throws -> Bool {
         let settings = await center.notificationSettings()
         let status = settings.authorizationStatus
@@ -125,6 +130,7 @@ final class DefaultNotificationService: NotificationService {
         content.userInfo[NotificationConstants.userInfoDueDate] = dueDate
         content.userInfo[NotificationConstants.userInfoOccurrence] = occurrence
         content.categoryIdentifier = NotificationConstants.categoryIdentifier
+        content.badge = NSNumber(value: 0)
 
         let dateComponents = dueDate.dueDateComponents()
         let trigger = UNCalendarNotificationTrigger(dateMatching: dateComponents, repeats: false)
@@ -140,7 +146,8 @@ final class DefaultNotificationService: NotificationService {
         }
     }
 
-    func deleteNotification(_ identifier: String) {
+    func deleteNotification(_ identifier: String?) {
+        guard let identifier else { return }
         center.removePendingNotificationRequests(withIdentifiers: [identifier])
     }
 
@@ -162,9 +169,11 @@ final class PreviewNotificationService: NotificationService {
         true
     }
 
-    func deleteNotification(_ identifier: String) {}
+    func deleteNotification(_ identifier: String?) {}
 
     func registerNotifications() {}
+
+    func removeAppBadge() {}
 
     func requestAuthorization() async throws -> Bool {
         true

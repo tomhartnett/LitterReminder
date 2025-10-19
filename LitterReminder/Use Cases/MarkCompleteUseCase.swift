@@ -27,17 +27,10 @@ final class DefaultMarkCompleteUseCase: MarkCompleteUseCase {
 
     @MainActor
     func execute(for cleaning: Cleaning, completedDate: Date, scheduleNextCleaning: Bool) async throws {
-        // Mark the current cleaning as complete
         try cleaningService.markComplete(cleaning, completedDate: completedDate)
-
-        // Complete the reminder if it exists
-        if let reminderID = cleaning.reminderID {
-            try reminderService.completeReminder(reminderID, completionDate: completedDate)
-        }
-
-        if let notificationID = cleaning.notificationID {
-            notificationService.deleteNotification(notificationID)
-        }
+        try reminderService.completeReminder(cleaning.reminderID, completionDate: completedDate)
+        notificationService.deleteNotification(cleaning.notificationID)
+        notificationService.removeAppBadge()
 
         if scheduleNextCleaning {
             try await scheduleNext(after: completedDate)
