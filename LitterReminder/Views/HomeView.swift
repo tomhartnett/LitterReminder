@@ -155,9 +155,9 @@ struct HomeView: View {
     @ViewBuilder
     private var confirmSheet: some View {
         NavigationStack {
-            ConfirmView() { completedDate, scheduleNextCleaning in
+            ConfirmView() { completedDate, nextCleaningDate in
                 withAnimation {
-                    viewModel.markComplete(completedDate, scheduleNextCleaning: scheduleNextCleaning)
+                    viewModel.markComplete(completedDate, nextCleaningDate: nextCleaningDate)
                 }
             }
             .presentationDetents([.medium])

@@ -1,7 +1,7 @@
 import Foundation
 
 protocol MarkCompleteUseCase {
-    func execute(for cleaning: Cleaning, completedDate: Date, scheduleNextCleaning: Bool) async throws
+    func execute(for cleaning: Cleaning, completedDate: Date, nextCleaningDate: Date?) async throws
 }
 
 final class DefaultMarkCompleteUseCase: MarkCompleteUseCase {
@@ -26,39 +26,30 @@ final class DefaultMarkCompleteUseCase: MarkCompleteUseCase {
     }
 
     @MainActor
-    func execute(for cleaning: Cleaning, completedDate: Date, scheduleNextCleaning: Bool) async throws {
+    func execute(for cleaning: Cleaning, completedDate: Date, nextCleaningDate: Date?) async throws {
         try cleaningService.markComplete(cleaning, completedDate: completedDate)
         try reminderService.completeReminder(cleaning.reminderID, completionDate: completedDate)
         notificationService.deleteNotification(cleaning.notificationID)
         notificationService.removeAppBadge()
 
-        if scheduleNextCleaning {
-            try await scheduleNext(after: completedDate)
+        if let nextCleaningDate {
+            try await scheduleNext(for: nextCleaningDate)
         }
     }
 
-    private func scheduleNext(after completedDate: Date) async throws {
-        let daysOut = appSettings.nextCleaningDaysOut
-        let hourOfDay = appSettings.nextCleaningHourOfDay
-        let calendar = Calendar.current
-        guard let tempDate = calendar.date(byAdding: .day, value: daysOut, to: completedDate),
-              let scheduledDate = calendar.date(bySettingHour: hourOfDay, minute: 0, second: 0, of: tempDate) else {
-            // TODO: throw new error type
-            fatalError("\(#function): Failed to create next date for completedDate: \(completedDate)")
-        }
-
+    private func scheduleNext(for date: Date) async throws {
         var notificationID: String?
         if appSettings.isNotificationsEnabled {
-            notificationID = try await notificationService.scheduleNotification(scheduledDate)
+            notificationID = try await notificationService.scheduleNotification(date)
         }
 
         var reminderID: String?
         if appSettings.isRemindersEnabled {
-            reminderID = try reminderService.addReminder(scheduledDate)
+            reminderID = try reminderService.addReminder(date)
         }
 
         try cleaningService.addCleaning(
-            scheduledDate: scheduledDate,
+            scheduledDate: date,
             notificationID: notificationID,
             reminderID: reminderID
         )
@@ -66,5 +57,5 @@ final class DefaultMarkCompleteUseCase: MarkCompleteUseCase {
 }
 
 final class PreviewMarkCompleteUseCase: MarkCompleteUseCase {
-    func execute(for cleaning: Cleaning, completedDate: Date, scheduleNextCleaning: Bool) async throws {}
+    func execute(for cleaning: Cleaning, completedDate: Date, nextCleaningDate: Date?) async throws {}
 }

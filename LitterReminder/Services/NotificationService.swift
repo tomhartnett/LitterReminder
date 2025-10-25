@@ -130,7 +130,7 @@ final class DefaultNotificationService: NotificationService {
         content.userInfo[NotificationConstants.userInfoDueDate] = dueDate
         content.userInfo[NotificationConstants.userInfoOccurrence] = occurrence
         content.categoryIdentifier = NotificationConstants.categoryIdentifier
-        content.badge = NSNumber(value: 0)
+        content.badge = NSNumber(value: 1)
 
         let dateComponents = dueDate.dueDateComponents()
         let trigger = UNCalendarNotificationTrigger(dateMatching: dateComponents, repeats: false)

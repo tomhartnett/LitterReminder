@@ -59,10 +59,11 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
         case NotificationConstants.markCompleteAction:
             do {
                 let scheduleNextCleaning = dependencies?.appSettings.isAutoScheduleEnabled ?? false
+                let nextCleaningDate = dependencies?.schedulingService.nextCleaningDate()
                 try await dependencies?.markCompleteUseCase.execute(
                     for: cleaning,
                     completedDate: .now,
-                    scheduleNextCleaning: scheduleNextCleaning
+                    nextCleaningDate: scheduleNextCleaning ? nextCleaningDate : nil
                 )
             } catch {
                 // TODO: handle error

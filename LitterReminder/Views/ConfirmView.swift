@@ -22,7 +22,7 @@ struct ConfirmView: View {
 
     @State private var hourOfDay = 17
 
-    var confirmAction: ((Date, Bool) -> Void)
+    var confirmAction: ((Date, Date?) -> Void)
 
     var body: some View {
         VStack(spacing: 16) {
@@ -86,10 +86,17 @@ struct ConfirmView: View {
             }
 
             ToolbarItem(placement: .bottomBar) {
-                Button(role: .confirm, action: {
-                    updateNextScheduleDate()
-                    dismiss()
-                    confirmAction(completedDate, scheduleNextCleaning)
+                Button(
+                    role: .confirm,
+                    action: {
+                        updateNextScheduleDate()
+
+                        dismiss()
+
+                        confirmAction(
+                            completedDate,
+                            scheduleNextCleaning ? nextScheduleDateFromNow : nil
+                        )
                 }) {
                     HStack {
                         Image(systemName: "checkmark.square")

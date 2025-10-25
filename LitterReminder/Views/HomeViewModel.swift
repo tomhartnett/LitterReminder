@@ -84,7 +84,7 @@ final class HomeViewModel {
         }
     }
 
-    func markComplete(_ currentDate: Date = .now, scheduleNextCleaning: Bool) {
+    func markComplete(_ currentDate: Date = .now, nextCleaningDate: Date?) {
         guard let scheduledCleaning else {
             return
         }
@@ -94,7 +94,7 @@ final class HomeViewModel {
                 try await dependencies.markCompleteUseCase.execute(
                     for: scheduledCleaning,
                     completedDate: currentDate,
-                    scheduleNextCleaning: scheduleNextCleaning
+                    nextCleaningDate: nextCleaningDate
                 )
                 fetchData()
             } catch {
