@@ -1,10 +1,10 @@
 # LitterReminder
 
-An app to schedule and track litter box cleanings. This is a real app I actually use 😆
+An app to schedule and track litter box cleanings. I actually use this app and rely on it.
 
 Tap Mark Complete button to mark the scheduled cleaning as complete. A new cleaning is automatically scheduled the day after tomorrow at 5:00 PM. These settings are configurable. Supports adding a reminder to the iOS Reminders app. Can also schedule a notification when the cleaning is due. The notification supports marking it complete or snoozing until tomorrow. 
 
-Last built with Xcode 26 beta.
+Last built with Xcode 26.0.1
 
 - Built with SwiftUI
 - Uses SwiftData to persist data
