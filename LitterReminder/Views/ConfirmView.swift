@@ -26,9 +26,8 @@ struct ConfirmView: View {
 
     var body: some View {
         VStack(spacing: 16) {
-            DatePicker(selection: $completedDate) {
-            }
-            .labelsHidden()
+            DatePicker(selection: $completedDate) {}
+                .labelsHidden()
 
             Divider()
 
