@@ -89,7 +89,7 @@ final class HomeViewModel {
             return
         }
 
-        Task {
+        Task { @MainActor in
             do {
                 try await dependencies.markCompleteUseCase.execute(
                     for: scheduledCleaning,

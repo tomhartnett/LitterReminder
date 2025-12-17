@@ -90,12 +90,12 @@ struct ConfirmView: View {
                     action: {
                         updateNextScheduleDate()
 
-                        dismiss()
-
                         confirmAction(
                             completedDate,
                             scheduleNextCleaning ? nextScheduleDateFromNow : nil
                         )
+
+                        dismiss()
                 }) {
                     HStack {
                         Image(systemName: "checkmark.square")
