@@ -14,59 +14,41 @@ class AppSettings {
 
     init(storage: UserDefaults = UserDefaults.standard) {
         self.storage = storage
+        self.nextCleaningHourOfDay = storage.object(forKey: StorageKey.nextCleaningHourOfDay.rawValue) as? Int ?? 17
+        self.nextCleaningDaysOut = storage.object(forKey: StorageKey.nextCleaningDaysOut.rawValue) as? Int ?? 2
+        self.isAutoScheduleEnabled = storage.object(forKey: StorageKey.isAutoScheduleEnabled.rawValue) as? Bool ?? true
+        self.isNotificationsEnabled = storage.object(forKey: StorageKey.isNotificationsEnabled.rawValue) as? Bool ?? false
+        self.isRemindersEnabled = storage.object(forKey: StorageKey.isRemindersEnabled.rawValue) as? Bool ?? false
     }
 
     var nextCleaningHourOfDay: Int {
-        get {
-            getSetting(.nextCleaningHourOfDay) ?? 17
-        }
-        set {
-            saveSetting(newValue, key: .nextCleaningHourOfDay)
+        didSet {
+            storage.set(nextCleaningHourOfDay, forKey: StorageKey.nextCleaningHourOfDay.rawValue)
         }
     }
 
     var nextCleaningDaysOut: Int {
-        get {
-            getSetting(.nextCleaningDaysOut) ?? 2
-        }
-        set {
-            saveSetting(newValue, key: .nextCleaningDaysOut)
+        didSet {
+            storage.set(nextCleaningDaysOut, forKey: StorageKey.nextCleaningDaysOut.rawValue)
         }
     }
 
     var isAutoScheduleEnabled: Bool {
-        get {
-            getSetting(.isAutoScheduleEnabled) ?? true
-        }
-        set {
-            saveSetting(newValue, key: .isAutoScheduleEnabled)
+        didSet {
+            storage.set(isAutoScheduleEnabled, forKey: StorageKey.isAutoScheduleEnabled.rawValue)
         }
     }
 
     var isNotificationsEnabled: Bool {
-        get {
-            getSetting(.isNotificationsEnabled) ?? false
-        }
-        set {
-            saveSetting(newValue, key: .isNotificationsEnabled)
+        didSet {
+            storage.set(isNotificationsEnabled, forKey: StorageKey.isNotificationsEnabled.rawValue)
         }
     }
 
     var isRemindersEnabled: Bool {
-        get {
-            getSetting(.isRemindersEnabled) ?? false
+        didSet {
+            storage.set(isRemindersEnabled, forKey: StorageKey.isRemindersEnabled.rawValue)
         }
-        set {
-            saveSetting(newValue, key: .isRemindersEnabled)
-        }
-    }
-
-    private func getSetting<T>(_ key: StorageKey) -> T? {
-        storage.object(forKey: key.rawValue) as? T
-    }
-
-    private func saveSetting<T>(_ value: T, key: StorageKey) {
-        storage.set(value, forKey: key.rawValue)
     }
 }
 
