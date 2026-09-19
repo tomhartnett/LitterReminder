@@ -16,7 +16,7 @@ struct ConfirmView: View {
 
     @State private var scheduleNextCleaning = false
 
-    @State var nextScheduleDateFromNow = Date()
+    @State var nextScheduleDate = Date()
 
     @State private var daysOut = 2
 
@@ -40,7 +40,7 @@ struct ConfirmView: View {
 
             if scheduleNextCleaning {
                 VStack(alignment: .leading) {
-                    Text(nextScheduleDateFromNow, format: .dateTime.weekday().month().day().hour())
+                    Text(nextScheduleDate, format: .dateTime.weekday().month().day().hour())
                         .font(.headline)
                         .foregroundStyle(.secondary)
 
@@ -92,7 +92,7 @@ struct ConfirmView: View {
 
                         confirmAction(
                             completedDate,
-                            scheduleNextCleaning ? nextScheduleDateFromNow : nil
+                            scheduleNextCleaning ? nextScheduleDate : nil
                         )
 
                         dismiss()
@@ -107,9 +107,12 @@ struct ConfirmView: View {
         }
         .onAppear {
             scheduleNextCleaning = dependencies.appSettings.isAutoScheduleEnabled
-            nextScheduleDateFromNow = dependencies.schedulingService.nextCleaningDate()
             daysOut = dependencies.appSettings.nextCleaningDaysOut
             hourOfDay = dependencies.appSettings.nextCleaningHourOfDay
+            updateNextScheduleDate()
+        }
+        .onChange(of: completedDate) { _, _ in
+            updateNextScheduleDate()
         }
         .onChange(of: daysOut) { _, _ in
             updateNextScheduleDate()
@@ -121,19 +124,18 @@ struct ConfirmView: View {
 
     func updateNextScheduleDate() {
         let calendar = Calendar.current
-        let now = Date()
-        guard let nowPlusDays = calendar.date(byAdding: .day, value: daysOut, to: now),
-              let nowPlusDaysAndTime = calendar.date(
+        guard let completedDatePlusDays = calendar.date(byAdding: .day, value: daysOut, to: completedDate),
+              let completedDatePlusDaysAndTime = calendar.date(
                 bySettingHour: hourOfDay,
                 minute: 0,
                 second: 0,
-                of: nowPlusDays
+                of: completedDatePlusDays
               ) else {
-            nextScheduleDateFromNow = now
+            nextScheduleDate = completedDate
             return
         }
 
-        nextScheduleDateFromNow = nowPlusDaysAndTime
+        nextScheduleDate = completedDatePlusDaysAndTime
     }
 
     func formatHour() -> String {
