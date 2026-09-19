@@ -77,10 +77,24 @@ final class HomeViewModel {
     }
 
     func fetchData() {
+        let previousScheduledID = scheduledCleaning?.identifier
+
         do {
             cleanings = try dependencies.cleaningService.fetchAllCleanings()
         } catch {
             // TODO: handle error
+        }
+
+        // If the cleaning we were previously waiting on was resolved
+        // elsewhere (marked complete or deleted on another device and
+        // synced via CloudKit), clear the badge here too, since
+        // removeAppBadge() only ran on the device that performed the action.
+        if let previousScheduledID {
+            let previouslyScheduled = cleanings.first(where: { $0.identifier == previousScheduledID })
+
+            if previouslyScheduled == nil || previouslyScheduled?.isComplete == true {
+                dependencies.notificationService.removeAppBadge()
+            }
         }
     }
 
