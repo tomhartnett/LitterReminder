@@ -9,8 +9,7 @@ import Foundation
 
 extension Date {
     func dueDateComponents(_ calendar: Calendar = .current) -> DateComponents {
-        // TODO: update to hamdle time zone changes
-        calendar.dateComponents([.year, .month, .day, .hour, .minute], from: self)
+        calendar.dateComponents([.year, .month, .day, .hour, .minute, .timeZone], from: self)
     }
 
     // Sat, May 17 at 11:51
