@@ -5,12 +5,16 @@
 //  Created by Tom Hartnett on 6/14/25.
 //
 
+import CoreData
 import SwiftData
 import UIKit
 
 final class AppDelegate: NSObject, UIApplicationDelegate {
     var dependencies: Dependencies?
     var modelContainer: ModelContainer?
+    var homeViewModel: HomeViewModel?
+
+    private var remoteChangeObserver: NSObjectProtocol?
 
     func application(
         _ application: UIApplication,
@@ -20,7 +24,25 @@ final class AppDelegate: NSObject, UIApplicationDelegate {
 
         UNUserNotificationCenter.current().delegate = self
 
+        observeRemoteChanges()
+
         return true
+    }
+
+    // SwiftData's CloudKit-backed store merges incoming changes into the
+    // main context in the background, but doesn't otherwise notify the app.
+    // Since the UI is driven by HomeViewModel's cached array rather than
+    // @Query, we need to explicitly refetch when that happens.
+    private func observeRemoteChanges() {
+        remoteChangeObserver = NotificationCenter.default.addObserver(
+            forName: .NSPersistentStoreRemoteChange,
+            object: nil,
+            queue: nil
+        ) { [weak self] _ in
+            Task { @MainActor in
+                self?.homeViewModel?.fetchData()
+            }
+        }
     }
 }
 

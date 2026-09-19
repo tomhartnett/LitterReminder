@@ -60,6 +60,7 @@ struct LitterReminderApp: App {
 
             appDelegate.dependencies = dependencies
             appDelegate.modelContainer = container
+            appDelegate.homeViewModel = homeViewModel
 
         } catch {
             fatalError("Failed to create dependencies or ViewModel.")
