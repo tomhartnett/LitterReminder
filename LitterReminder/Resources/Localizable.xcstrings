@@ -19,7 +19,7 @@
     "A notification will be sent when it's time to clean the litter box." : {
 
     },
-    "A reminder will be added to the Reminders app." : {
+    "A reminder will be added to the Reminders app with this title:" : {
 
     },
     "Add Past Cleaning" : {
@@ -47,6 +47,9 @@
 
     },
     "Cancel" : {
+
+    },
+    "Clean the litter box" : {
 
     },
     "Cleaning is due" : {
@@ -130,6 +133,9 @@
     "Remind Me Tomorrow" : {
 
     },
+    "Reminder title" : {
+
+    },
     "Reminders" : {
 
     },
@@ -149,9 +155,6 @@
 
     },
     "Scheduled" : {
-
-    },
-    "Scoop the poop" : {
 
     },
     "Settings" : {

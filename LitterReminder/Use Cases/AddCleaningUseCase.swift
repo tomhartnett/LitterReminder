@@ -43,7 +43,7 @@ final class DefaultAddCleaningUseCase: AddCleaningUseCase {
 
         var reminderID: String?
         if appSettings.isRemindersEnabled {
-            reminderID = try reminderService.addReminder(scheduledDate)
+            reminderID = try reminderService.addReminder(scheduledDate, title: appSettings.resolvedReminderTitle)
         }
 
         try cleaningService.addCleaning(

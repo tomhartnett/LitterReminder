@@ -45,7 +45,7 @@ final class DefaultMarkCompleteUseCase: MarkCompleteUseCase {
 
         var reminderID: String?
         if appSettings.isRemindersEnabled {
-            reminderID = try reminderService.addReminder(date)
+            reminderID = try reminderService.addReminder(date, title: appSettings.resolvedReminderTitle)
         }
 
         try cleaningService.addCleaning(

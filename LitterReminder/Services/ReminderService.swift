@@ -10,7 +10,7 @@ import Foundation
 
 protocol ReminderService {
     var isPermissionGranted: Bool { get }
-    func addReminder(_ dueDate: Date) throws -> String
+    func addReminder(_ dueDate: Date, title: String) throws -> String
     func completeReminder(_ identifier: String?, completionDate: Date?) throws
     func deleteReminder(_ identifier: String?) throws
     func requestRemindersAccess() async throws -> Bool
@@ -57,13 +57,13 @@ final class DefaultReminderService: ReminderService {
         }
     }
 
-    func addReminder(_ dueDate: Date) throws -> String {
+    func addReminder(_ dueDate: Date, title: String) throws -> String {
         guard let calendar = eventStore.calendars(for: .reminder).first(where: { $0.title == "Reminders" }) else {
             throw ReminderServiceError.calendarNotFound
         }
 
         let reminder = EKReminder(eventStore: eventStore)
-        reminder.title = String(localized: "Scoop the poop")
+        reminder.title = title
         reminder.calendar = calendar
         reminder.dueDateComponents = dueDate.dueDateComponents()
         reminder.addAlarm(EKAlarm(absoluteDate: dueDate))
@@ -145,7 +145,7 @@ final class PreviewReminderService: ReminderService {
         true
     }
 
-    func addReminder(_ dueDate: Date) throws -> String {
+    func addReminder(_ dueDate: Date, title: String) throws -> String {
         UUID().uuidString
     }
     

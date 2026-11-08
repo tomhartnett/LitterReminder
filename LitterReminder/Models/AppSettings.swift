@@ -19,6 +19,11 @@ class AppSettings {
         self.isAutoScheduleEnabled = storage.object(forKey: StorageKey.isAutoScheduleEnabled.rawValue) as? Bool ?? true
         self.isNotificationsEnabled = storage.object(forKey: StorageKey.isNotificationsEnabled.rawValue) as? Bool ?? false
         self.isRemindersEnabled = storage.object(forKey: StorageKey.isRemindersEnabled.rawValue) as? Bool ?? false
+        self.reminderTitle = storage.string(forKey: StorageKey.reminderTitle.rawValue) ?? Self.defaultReminderTitle
+    }
+
+    static var defaultReminderTitle: String {
+        String(localized: "Clean the litter box")
     }
 
     var nextCleaningHourOfDay: Int {
@@ -50,6 +55,19 @@ class AppSettings {
             storage.set(isRemindersEnabled, forKey: StorageKey.isRemindersEnabled.rawValue)
         }
     }
+
+    /// The title used for reminders added to the Reminders app.
+    var reminderTitle: String {
+        didSet {
+            storage.set(reminderTitle, forKey: StorageKey.reminderTitle.rawValue)
+        }
+    }
+
+    /// `reminderTitle`, falling back to the default when blank.
+    var resolvedReminderTitle: String {
+        let trimmed = reminderTitle.trimmingCharacters(in: .whitespacesAndNewlines)
+        return trimmed.isEmpty ? Self.defaultReminderTitle : trimmed
+    }
 }
 
 extension AppSettings {
@@ -59,5 +77,6 @@ extension AppSettings {
         case isRemindersEnabled = "appSetting-isRemindersEnabled"
         case nextCleaningHourOfDay = "appSetting-nextCleaningHourOfDay"
         case nextCleaningDaysOut = "appSetting-nextCleaningDaysOut"
+        case reminderTitle = "appSetting-reminderTitle"
     }
 }

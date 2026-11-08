@@ -65,7 +65,7 @@ final class DefaultEditCleaningUseCase: EditCleaningUseCase {
         }
 
         if appSettings.isRemindersEnabled {
-            cleaning.reminderID = try reminderService.addReminder(date)
+            cleaning.reminderID = try reminderService.addReminder(date, title: appSettings.resolvedReminderTitle)
         }
     }
 }

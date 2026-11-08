@@ -106,10 +106,23 @@ struct SettingsView: View {
                 }
             )
 
-            Text("A reminder will be added to the Reminders app.")
+            Text("A reminder will be added to the Reminders app with this title:")
                 .font(.callout)
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
+
+            TextField(
+                "Reminder title",
+                text: $appSettings.reminderTitle,
+                prompt: Text(AppSettings.defaultReminderTitle)
+            )
+            .textFieldStyle(.roundedBorder)
+            .foregroundStyle(viewModel.isRemindersEnabled ? .primary : .secondary)
+            .disabled(!viewModel.isRemindersEnabled)
+            .submitLabel(.done)
+            .onSubmit {
+                normalizeReminderTitle()
+            }
         }
         .frame(maxHeight: .infinity, alignment: .top)
         .padding()
@@ -118,6 +131,7 @@ struct SettingsView: View {
         .toolbar {
             ToolbarItem(placement: .bottomBar) {
                 Button(role: .confirm, action: {
+                    normalizeReminderTitle()
                     dismiss()
                 }) {
                     HStack {
@@ -162,6 +176,11 @@ struct SettingsView: View {
         .onChange(of: appSettings.nextCleaningHourOfDay) { _, _ in
             buildDate()
         }
+    }
+
+    /// Trims whitespace and restores the default if the title was left blank.
+    func normalizeReminderTitle() {
+        appSettings.reminderTitle = appSettings.resolvedReminderTitle
     }
 
     func buildDate() {
