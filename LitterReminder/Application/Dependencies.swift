@@ -15,6 +15,7 @@ protocol Dependencies: Observable {
     var cleaningService: CleaningService { get }
     var addCleaningUseCase: AddCleaningUseCase { get }
     var deleteUseCase: DeleteUseCase { get }
+    var editCleaningUseCase: EditCleaningUseCase { get }
     var markCompleteUseCase: MarkCompleteUseCase { get }
 }
 
@@ -27,6 +28,7 @@ final class AppDependencies: Dependencies {
     let schedulingService: SchedulingService
     let addCleaningUseCase: AddCleaningUseCase
     let deleteUseCase: DeleteUseCase
+    let editCleaningUseCase: EditCleaningUseCase
     let markCompleteUseCase: MarkCompleteUseCase
 
     init(
@@ -51,6 +53,13 @@ final class AppDependencies: Dependencies {
         )
 
         deleteUseCase = DefaultDeleteUseCase(
+            cleaningService: cleaningService,
+            reminderService: reminderService,
+            notificationService: notificationService
+        )
+
+        editCleaningUseCase = DefaultEditCleaningUseCase(
+            appSettings: appSettings,
             cleaningService: cleaningService,
             reminderService: reminderService,
             notificationService: notificationService
@@ -87,5 +96,6 @@ final class PreviewDependencies: Dependencies {
     let cleaningService: CleaningService = PreviewCleaningService()
     let addCleaningUseCase: AddCleaningUseCase = PreviewAddCleaningUseCase()
     let deleteUseCase: DeleteUseCase = PreviewDeleteUseCase()
+    let editCleaningUseCase: EditCleaningUseCase = PreviewEditCleaningUseCase()
     let markCompleteUseCase: MarkCompleteUseCase = PreviewMarkCompleteUseCase()
 }

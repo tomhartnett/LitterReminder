@@ -76,6 +76,21 @@ final class HomeViewModel {
         fetchData()
     }
 
+    func edit(_ cleaning: Cleaning, scheduledDate: Date, completedDate: Date?) {
+        Task { @MainActor in
+            do {
+                try await dependencies.editCleaningUseCase.execute(
+                    cleaning,
+                    scheduledDate: scheduledDate,
+                    completedDate: completedDate
+                )
+            } catch {
+                errorMessage = error.localizedDescription
+            }
+            fetchData()
+        }
+    }
+
     func fetchData() {
         let previousScheduledID = scheduledCleaning?.identifier
 

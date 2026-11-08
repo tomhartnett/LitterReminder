@@ -52,6 +52,9 @@
     "Cleaning scheduled" : {
 
     },
+    "Completed" : {
+
+    },
     "Could not add notification to the system" : {
 
     },
@@ -74,6 +77,12 @@
 
     },
     "Done" : {
+
+    },
+    "Edit" : {
+
+    },
+    "Edit Cleaning" : {
 
     },
     "Error" : {
@@ -125,6 +134,9 @@
 
     },
     "Schedule next cleaning" : {
+
+    },
+    "Scheduled" : {
 
     },
     "Scoop the poop" : {

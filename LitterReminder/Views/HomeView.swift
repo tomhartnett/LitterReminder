@@ -8,8 +8,9 @@
 import SwiftUI
 
 extension HomeView {
-    enum HomeViewSheet: Identifiable {
+    enum HomeViewSheet: Identifiable, Hashable {
         case confirmMarkComplete
+        case edit(Cleaning)
         case settings
 
         var id: Self {
@@ -55,6 +56,28 @@ struct HomeView: View {
                             } label: {
                                 Label("Delete", systemImage: "trash")
                             }
+
+                            Button {
+                                sheet = .edit(item)
+                            } label: {
+                                Label("Edit", systemImage: "pencil")
+                            }
+                            .tint(.blue)
+                        }
+                        .contextMenu {
+                            Button {
+                                sheet = .edit(item)
+                            } label: {
+                                Label("Edit", systemImage: "pencil")
+                            }
+
+                            Button(role: .destructive) {
+                                withAnimation {
+                                    viewModel.delete(item)
+                                }
+                            } label: {
+                                Label("Delete", systemImage: "trash")
+                            }
                         }
                         .listRowSeparator(
                             // Possibly a iOS 26 beta bug. Last item shows a separator beneath it.
@@ -89,6 +112,9 @@ struct HomeView: View {
             switch item {
             case .confirmMarkComplete:
                 confirmSheet
+
+            case .edit(let cleaning):
+                editSheet(cleaning)
 
             case .settings:
                 settingsSheet
@@ -158,6 +184,21 @@ struct HomeView: View {
             ConfirmView() { completedDate, nextCleaningDate in
                 withAnimation {
                     viewModel.markComplete(completedDate, nextCleaningDate: nextCleaningDate)
+                }
+            }
+            .presentationDetents([.medium])
+        }
+    }
+
+    @ViewBuilder
+    private func editSheet(_ cleaning: Cleaning) -> some View {
+        NavigationStack {
+            EditCleaningView(
+                scheduledDate: cleaning.scheduledDate,
+                completedDate: cleaning.completedDate
+            ) { scheduledDate, completedDate in
+                withAnimation {
+                    viewModel.edit(cleaning, scheduledDate: scheduledDate, completedDate: completedDate)
                 }
             }
             .presentationDetents([.medium])
