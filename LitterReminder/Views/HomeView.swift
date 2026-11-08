@@ -9,6 +9,7 @@ import SwiftUI
 
 extension HomeView {
     enum HomeViewSheet: Identifiable, Hashable {
+        case addPastCleaning
         case confirmMarkComplete
         case edit(Cleaning)
         case settings
@@ -110,6 +111,9 @@ struct HomeView: View {
         })
         .sheet(item: $sheet) { item in
             switch item {
+            case .addPastCleaning:
+                addPastCleaningSheet
+
             case .confirmMarkComplete:
                 confirmSheet
 
@@ -121,6 +125,12 @@ struct HomeView: View {
             }
         }
         .toolbar {
+            ToolbarItem(placement: .bottomBar) {
+                MoreButton(addPastCleaningAction: {
+                    sheet = .addPastCleaning
+                })
+            }
+
             ToolbarSpacer(.flexible, placement: .bottomBar)
 
             ToolbarItem(placement: .bottomBar) {
@@ -184,6 +194,18 @@ struct HomeView: View {
             ConfirmView() { completedDate, nextCleaningDate in
                 withAnimation {
                     viewModel.markComplete(completedDate, nextCleaningDate: nextCleaningDate)
+                }
+            }
+            .presentationDetents([.medium])
+        }
+    }
+
+    @ViewBuilder
+    private var addPastCleaningSheet: some View {
+        NavigationStack {
+            AddPastCleaningView { completedDate in
+                withAnimation {
+                    viewModel.addPastCleaning(completedDate: completedDate)
                 }
             }
             .presentationDetents([.medium])

@@ -71,6 +71,15 @@ final class HomeViewModel {
         }
     }
 
+    func addPastCleaning(completedDate: Date) {
+        do {
+            try dependencies.cleaningService.addPastCleaning(completedDate: completedDate)
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+        fetchData()
+    }
+
     func delete(_ cleaning: Cleaning) {
         dependencies.deleteUseCase.execute(cleaning)
         fetchData()

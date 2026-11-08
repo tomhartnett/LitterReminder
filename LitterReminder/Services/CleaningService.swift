@@ -14,6 +14,10 @@ protocol CleaningService {
         reminderID: String?
     ) throws -> String
 
+    /// Adds an already-completed cleaning, e.g. one the user forgot to record.
+    @discardableResult
+    func addPastCleaning(completedDate: Date) throws -> String
+
     func markComplete(_ cleaning: Cleaning, completedDate: Date) throws
 
     func deleteCleaning(_ cleaning: Cleaning) throws
@@ -81,7 +85,24 @@ final class DefaultCleaningService: CleaningService {
 
         return cleaning.identifier
     }
-    
+
+    @discardableResult
+    func addPastCleaning(completedDate: Date) throws -> String {
+        // Use the completed date for created/scheduled too, so the cleaning
+        // sorts chronologically among existing cleanings (list is ordered by createdDate).
+        let cleaning = Cleaning(
+            identifier: UUID().uuidString,
+            createdDate: completedDate,
+            scheduledDate: completedDate,
+            completedDate: completedDate
+        )
+        modelContext.insert(cleaning)
+
+        try modelContext.save()
+
+        return cleaning.identifier
+    }
+
     func markComplete(_ cleaning: Cleaning, completedDate: Date) throws {
         cleaning.completedDate = completedDate
         try modelContext.save()
@@ -128,6 +149,10 @@ final class PreviewCleaningService: CleaningService {
         notificationID: String?,
         reminderID: String?
     ) throws -> String {
+        return UUID().uuidString
+    }
+
+    func addPastCleaning(completedDate: Date) throws -> String {
         return UUID().uuidString
     }
 

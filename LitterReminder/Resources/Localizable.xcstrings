@@ -22,6 +22,12 @@
     "A reminder will be added to the Reminders app." : {
 
     },
+    "Add Past Cleaning" : {
+
+    },
+    "Add past cleaning..." : {
+
+    },
     "An unknown error has occurred." : {
 
     },
@@ -100,6 +106,9 @@
     "Mark Complete?" : {
 
     },
+    "More" : {
+
+    },
     "Next cleaning schedule" : {
 
     },
@@ -113,6 +122,9 @@
 
     },
     "Permission Needed" : {
+
+    },
+    "Record a cleaning that was done but not entered." : {
 
     },
     "Remind Me Tomorrow" : {
