@@ -125,12 +125,6 @@ struct HomeView: View {
             }
         }
         .toolbar {
-            ToolbarItem(placement: .bottomBar) {
-                MoreButton(addPastCleaningAction: {
-                    sheet = .addPastCleaning
-                })
-            }
-
             ToolbarSpacer(.flexible, placement: .bottomBar)
 
             ToolbarItem(placement: .bottomBar) {
@@ -140,11 +134,14 @@ struct HomeView: View {
             ToolbarSpacer(.flexible, placement: .bottomBar)
 
             ToolbarItem(placement: .bottomBar) {
-                Button(action: {
-                    sheet = .settings
-                }) {
-                    Image(systemName: "gearshape")
-                }
+                MoreButton(
+                    addPastCleaningAction: {
+                        sheet = .addPastCleaning
+                    },
+                    settingsAction: {
+                        sheet = .settings
+                    }
+                )
             }
         }
     }

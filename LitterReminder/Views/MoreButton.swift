@@ -8,8 +8,16 @@ import SwiftUI
 struct MoreButton: View {
     var addPastCleaningAction: () -> Void
 
+    var settingsAction: () -> Void
+
     var body: some View {
         Menu {
+            Button(action: settingsAction) {
+                Label("Settings", systemImage: "gearshape")
+            }
+
+            Divider()
+
             Button(action: addPastCleaningAction) {
                 Label("Add past cleaning...", systemImage: "clock.arrow.circlepath")
             }
@@ -21,5 +29,5 @@ struct MoreButton: View {
 }
 
 #Preview {
-    MoreButton(addPastCleaningAction: {})
+    MoreButton(addPastCleaningAction: {}, settingsAction: {})
 }
